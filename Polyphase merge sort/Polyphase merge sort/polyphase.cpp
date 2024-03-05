@@ -6,6 +6,18 @@
 #include<vector>
 #include<iterator>
 
+struct FileStruct
+{
+	int filesNumber = 6;
+	std::string orig;
+	std::string* fileName = nullptr;
+	std::fstream fileStream;
+	int* ip = nullptr;
+	int* ms = nullptr;
+	int L = 0;
+
+};
+
 std::string* CreateFiles(int filesNumber)
 {
 	std::string* fileName = new std::string[filesNumber];
