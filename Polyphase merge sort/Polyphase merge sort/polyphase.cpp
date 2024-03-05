@@ -68,24 +68,70 @@ void Splitting(FileStruct& file)
 		file.ms[i] = file.ip[i] = 1;
 	}
 	file.ms[file.filesNumber - 1] = file.ip[file.filesNumber - 1] = 0;
+	std::vector<std::fstream> fileVec;
 
-	ipmsForming(file);
-
-	int number;
-	int prev = INT_MIN;
-	while (file.fileStream >> number)
+	for (int i = 0; i < file.filesNumber - 1; i++)
 	{
-		if (prev > number) std::cout << std::endl;
-		std::cout << number << " ";
-		prev = number;
-		while (file.fileStream >> number && prev < number)
+		fileVec.push_back(std::fstream(file.fileName[i], std::ios::out));
+	}
+
+
+	for (int i = 0; i < file.filesNumber-1;)
+	{
+		for (int j = 0; j < file.filesNumber; j++)
 		{
-			std::cout << number << " ";
-			prev = number;
+			std::cout << file.ms[j] << " ";
 		}
+
 		std::cout << std::endl;
-		std::cout << number << " ";
-		prev = number;
+		int number=0;
+		int prev = INT_MIN;
+		std::streampos prevPosition;
+		while (file.ms[i]!=0 && file.fileStream >> number)
+		{
+			prevPosition = file.fileStream.tellg();
+			if (prev >= number)
+			{
+				std::cout << std::endl;
+				--file.ms[i];
+			}
+
+			std::cout << number << " ";
+			fileVec[i] << number<<" ";
+			prev = number;
+			while (file.ms[i] != 0 && file.fileStream >> number && prev <= number)
+			{
+				std::cout << number << " ";
+				fileVec[i] << number << " ";
+				prev = number;
+				prevPosition = file.fileStream.tellg();
+			}
+			
+			std::cout << std::endl;
+			--file.ms[i];
+
+			
+		}
+		if (!file.fileStream.eof())
+			file.fileStream.seekg(prevPosition);
+		
+		if (file.ms[i] < file.ms[i + 1])
+			i++;
+		else if (file.ms[i] == 0)
+		{
+			ipmsForming(file);
+			std::cout << "\n\n";
+			if (!file.fileStream.eof())
+				i = 0;
+			else
+			{
+				fileVec[0] << number << " ";
+				file.ms[0]--;
+				break;
+			}
+		}
+		else i = 0;
+
 	}
 
 }
@@ -93,7 +139,7 @@ void Splitting(FileStruct& file)
 void PolyphaseSort(FileStruct& file)
 {
 
-	file.orig = "../../../arr_size_10000_in_range_1000.txt";
+	
 	file.fileName = CreateFiles(file.filesNumber);
 	file.ip = new int[file.filesNumber];
 	file.ms = new int[file.filesNumber];
@@ -106,6 +152,11 @@ void PolyphaseSort(FileStruct& file)
 
 int main()
 {
-
+	FileStruct file;
+	file.filesNumber = 6;
+	file.orig = "../../../test.txt";
+	//file.orig = "../../../arr_size_10000_in_range_100000.txt";
+	
+	PolyphaseSort(file);
 	return 0;
 }
