@@ -49,6 +49,61 @@ void ShiftFiles(std::string* fileName, int filesNumber)
 		std::cout << "erorr!";
 }
 
+void ipmsForming(FileStruct& file)
+{
+	int ip0 = file.ip[0];
+	for (int k = 0; k < file.filesNumber - 1; ++k)
+	{
+		file.ms[k] = file.ip[k + 1] - file.ip[k] + ip0;
+		file.ip[k] = file.ip[k + 1] + ip0;
+	}
+	file.L++;
+
+}
+
+void Splitting(FileStruct& file)
+{
+	for (int i = 0; i < file.filesNumber - 1; ++i)
+	{
+		file.ms[i] = file.ip[i] = 1;
+	}
+	file.ms[file.filesNumber - 1] = file.ip[file.filesNumber - 1] = 0;
+
+	ipmsForming(file);
+
+	int number;
+	int prev = INT_MIN;
+	while (file.fileStream >> number)
+	{
+		if (prev > number) std::cout << std::endl;
+		std::cout << number << " ";
+		prev = number;
+		while (file.fileStream >> number && prev < number)
+		{
+			std::cout << number << " ";
+			prev = number;
+		}
+		std::cout << std::endl;
+		std::cout << number << " ";
+		prev = number;
+	}
+
+}
+
+void PolyphaseSort(FileStruct& file)
+{
+
+	file.orig = "../../../arr_size_10000_in_range_1000.txt";
+	file.fileName = CreateFiles(file.filesNumber);
+	file.ip = new int[file.filesNumber];
+	file.ms = new int[file.filesNumber];
+	file.fileStream = std::fstream(file.orig, std::ios::in);
+	Splitting(file);
+
+	file.fileStream.close();
+	FreeMemory(file.fileName);
+}
+
 int main()
 {
 
