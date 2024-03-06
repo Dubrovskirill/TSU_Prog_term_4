@@ -59,6 +59,8 @@ void ipmsForming(FileStruct& file)
 	}
 	file.L++;
 
+	
+
 }
 
 void Splitting(FileStruct& file)
@@ -68,71 +70,52 @@ void Splitting(FileStruct& file)
 		file.ms[i] = file.ip[i] = 1;
 	}
 	file.ms[file.filesNumber - 1] = file.ip[file.filesNumber - 1] = 0;
-	std::vector<std::fstream> fileVec;
+	file.L++;
 
+	file.fileStream = std::fstream(file.orig, std::ios::in);
+	std::vector<std::fstream> fileVec;
 	for (int i = 0; i < file.filesNumber - 1; i++)
 	{
 		fileVec.push_back(std::fstream(file.fileName[i], std::ios::out));
 	}
 
-
-	for (int i = 0; i < file.filesNumber-1;)
+	int i = 0;
+	int number = INT_MIN;
+	int prev = INT_MIN;
+	file.fileStream >> number;
+	
+	while(!file.fileStream.eof())
 	{
-		for (int j = 0; j < file.filesNumber; j++)
+		prev = INT_MIN;
+		while (prev <= number && !file.fileStream.eof())
 		{
-			std::cout << file.ms[j] << " ";
-		}
-
-		std::cout << std::endl;
-		int number=0;
-		int prev = INT_MIN;
-		std::streampos prevPosition;
-		while (file.ms[i]!=0 && file.fileStream >> number)
-		{
-			prevPosition = file.fileStream.tellg();
-			if (prev >= number)
-			{
-				std::cout << std::endl;
-				--file.ms[i];
-			}
-
-			std::cout << number << " ";
-			fileVec[i] << number<<" ";
+			fileVec[i] << number << " ";
 			prev = number;
-			while (file.ms[i] != 0 && file.fileStream >> number && prev <= number)
-			{
-				std::cout << number << " ";
-				fileVec[i] << number << " ";
-				prev = number;
-				prevPosition = file.fileStream.tellg();
-			}
-			
-			std::cout << std::endl;
-			--file.ms[i];
-
-			
+			file.fileStream >> number;
 		}
-		if (!file.fileStream.eof())
-			file.fileStream.seekg(prevPosition);
+		
+		--file.ms[i];
 		
 		if (file.ms[i] < file.ms[i + 1])
 			i++;
 		else if (file.ms[i] == 0)
 		{
 			ipmsForming(file);
-			std::cout << "\n\n";
-			if (!file.fileStream.eof())
-				i = 0;
-			else
-			{
-				fileVec[0] << number << " ";
-				file.ms[0]--;
-				break;
-			}
+			i = 0;
 		}
 		else i = 0;
 
+		if (file.fileStream.eof())
+		{
+			fileVec[i] << number << " ";
+			--file.ms[i];
+		}
+		
 	}
+
+	for (int i = 0; i < file.filesNumber - 1; i++)
+		fileVec[i].close();
+	file.fileStream.close();
 
 }
 
@@ -143,10 +126,9 @@ void PolyphaseSort(FileStruct& file)
 	file.fileName = CreateFiles(file.filesNumber);
 	file.ip = new int[file.filesNumber];
 	file.ms = new int[file.filesNumber];
-	file.fileStream = std::fstream(file.orig, std::ios::in);
 	Splitting(file);
 
-	file.fileStream.close();
+	
 	FreeMemory(file.fileName);
 }
 
@@ -155,7 +137,7 @@ int main()
 	FileStruct file;
 	file.filesNumber = 6;
 	file.orig = "../../../test.txt";
-	//file.orig = "../../../arr_size_10000_in_range_100000.txt";
+	//file.orig = "../../../arr_size_10000_in_range_10.txt";
 	
 	PolyphaseSort(file);
 	return 0;
