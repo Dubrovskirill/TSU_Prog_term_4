@@ -37,24 +37,31 @@ void FreeMemory(std::string* fileName)
 }
 
 void ShiftFiles(FileStruct& file, std::vector<std::fstream>& fileVec)
-{
-	if (rename(file.fileName[file.filesCount - 1].c_str(), "temp.txt"))
-		std::cout << "erorr!";
+{	
 	for (int i = file.filesCount - 2; i >= 0; --i)
 	{
-		if (rename(file.fileName[i].c_str(), file.fileName[i + 1].c_str()))
-			std::cout << "erorr!";
-
 		std::swap(file.fileName[i], file.fileName[i + 1]);
 		std::swap(file.ms[i], file.ms[i + 1]);
-		std::swap(file.ip[i], file.ip[i + 1]);
-
+		std::swap(fileVec[i], fileVec[i + 1]);
 	}
-	if (rename("temp.txt", file.fileName[0].c_str()))
-		std::cout << "erorr!";
-	std::swap(file.fileName[0], file.fileName[file.filesCount-1]);
-	std::swap(file.ms[0], file.ms[file.filesCount - 1]);
-	std::swap(file.ip[0], file.ip[file.filesCount - 1]);
+}
+
+void Rename(FileStruct& file)
+{
+	for (int i = 0; i < file.L-1; i++)
+		for(int j=0;j<file.filesCount-1;j++)
+			std::swap(file.fileName[j], file.fileName[j + 1]);
+	for (int k = 0; k < file.L-1; k++)
+	{
+		if (rename(file.fileName[file.filesCount - 1].c_str(), "temp.txt"))
+			std::cout << "error!";
+		for (int i = file.filesCount - 2; i >= 0; --i)
+			if (rename(file.fileName[i].c_str(), file.fileName[i + 1].c_str()))
+				std::cout << "error!";
+		if (rename("temp.txt", file.fileName[0].c_str()))
+			std::cout << "error!";
+	}
+	
 }
 
 void ipmsForming(FileStruct& file)
@@ -66,9 +73,6 @@ void ipmsForming(FileStruct& file)
 		file.ip[k] = file.ip[k + 1] + ip0;
 	}
 	file.L++;
-
-	
-
 }
 
 void Splitting(FileStruct& file)
@@ -93,27 +97,13 @@ void Splitting(FileStruct& file)
 	
 	while(!file.fileStream.eof())
 	{
-		/*for (int i = 0; i < file.filesCount; i++)
-		{
-			std::cout << file.ms[i] << " ";
-		}
-		std::cout << "   ";
-		for (int i = 0; i < file.filesCount; i++)
-		{
-			std::cout << file.ip[i] << " ";
-		}
-		std::cout << std::endl;*/
-
-		
 		while (file.fileStream >> number && prev <= number)
 		{
 			fileVec[i] << number << " ";
 			prev = number;
 		}
-		fileVec[i] << INT_MIN << " ";
+		fileVec[i] << INT_MAX << " ";
 		--file.ms[i];
-		
-		
 		
 		if (file.ms[i] < file.ms[i + 1])
 			i++;
@@ -126,17 +116,8 @@ void Splitting(FileStruct& file)
 		if (file.fileStream)
 		{
 			fileVec[i] << number << " ";
-			//fileVec[i] << INT_MIN << " ";
 			prev = number;
 		}
-
-		/*if (file.fileStream.eof())
-		{
-			fileVec[i] << number << " ";
-			--file.ms[i];
-		}*/
-
-		
 	}
 
 	for (int i = 0; i < file.filesCount - 1; i++)
@@ -145,82 +126,81 @@ void Splitting(FileStruct& file)
 
 }
 
-//void Merging(FileStruct& file)
-//{
-//	std::vector<std::fstream> fileVec;
-//	for (int i = 0; i < file.filesCount - 1; i++)
-//		fileVec.push_back(std::fstream(file.fileName[i], std::ios::in));
-//	fileVec.push_back(std::fstream(file.fileName[file.filesCount - 1], std::ios::out));
-//	while (file.L != 0)
-//	{
-//		//std::cout << file.L << " ";
-//		while (!fileVec[file.filesCount - 2].eof())
-//		{
-//			for (int i = 0; i < file.filesCount; i++)
-//			{
-//				std::cout << file.ms[i] << " ";
-//			}
-//			std::cout << "   ";
-//			for (int i = 0; i < file.filesCount; i++)
-//			{
-//				std::cout << file.ip[i] << " ";
-//			}
-//			std::cout << std::endl;
-//			bool check = true;
-//			for (int i = 0; i < file.filesCount - 1; ++i)
-//				if (file.ms[i] <= 0)
-//					check = false;
-//			if (check)
-//			{
-//				for (int i = 0; i < file.filesCount - 1; --file.ms[i], i++);
-//				file.ms[file.filesCount]++;
-//			}
-//
-//			for (int i = 0; i < file.filesCount; i++)
-//			{
-//				std::cout << file.ms[i] << " ";
-//			}
-//			std::cout << "   ";
-//			for (int i = 0; i < file.filesCount; i++)
-//			{
-//				std::cout << file.ip[i] << " ";
-//			}
-//			std::cout << std::endl;
-//			for (int i = 0; i < file.filesCount - 1; ++i)
-//			{
-//
-//				if (file.ms[i] == 0)
-//				{
-//					int number = 0;
-//					int prev = INT_MIN;
-//					fileVec[i] >> number;
-//					while (prev <= number && !fileVec[i].eof())
-//					{
-//						fileVec[i] << number << " ";
-//						fileVec[i] >> number;
-//						prev = number;
-//						
-//					}
-//				}
-//				if (file.ms[i] > 0)
-//					file.ms[i]--;
-//			}
-//		}
-//		file.L--;
-//		fileVec[file.filesCount-1].close();
-//		fileVec.push_back(std::fstream(file.fileName[file.filesCount - 1], std::ios::in));
-//		fileVec[file.filesCount-2].close();
-//		fileVec.push_back(std::fstream(file.fileName[file.filesCount - 2], std::ios::out));
-//		ShiftFiles(file, fileVec);
-//
-//
-//	}
-//	
-//	for (int i = 0; i < file.filesCount; i++)
-//		fileVec[i].close();
-//
-//	
-//}
+int findMinIndex(const std::vector<int>& vec) {
+	auto minIt = std::min_element(vec.begin(), vec.end());
+	return std::distance(vec.begin(), minIt);
+}
+
+void Merging(FileStruct& file)
+{
+	std::vector<std::fstream> fileVec;
+	for (int i = 0; i < file.filesCount - 1; i++)
+		fileVec.push_back(std::fstream(file.fileName[i], std::ios::in));
+	fileVec.push_back(std::fstream(file.fileName[file.filesCount-1], std::ios::out));
+	int curL = file.L;
+	while (curL != 0)
+	{
+		
+			bool check = true;
+			int i = 0;
+			for (int i = 0; i < file.filesCount - 1 && check; ++i)
+				if (file.ms[i] == 0)
+					check = false;
+			if (check)
+			{
+				for (int i = 0; i < file.filesCount - 1; ++i)
+					file.ms[i]--;
+				file.ms[file.filesCount - 1]++;
+			}
+			//возможно стоит переписать
+			std::vector<int> vec;
+			for (int i = 0; i < file.filesCount - 1; ++i)
+			{
+				int number= INT_MAX;
+				if (file.ms[i] == 0)
+				{
+					fileVec[i] >> number;
+					vec.push_back(number);
+					
+				}
+				else
+				{
+					file.ms[i]--;
+					vec.push_back(INT_MAX);
+				}
+			}
+			
+			int minIndex = findMinIndex(vec);
+			fileVec[file.filesCount - 1] << vec[minIndex]<<" ";
+			int number;
+			while (vec[minIndex] != INT_MAX)
+			{
+				fileVec[minIndex] >> number;
+				vec[minIndex]=number;
+
+				minIndex = findMinIndex(vec);
+				fileVec[file.filesCount - 1] << vec[minIndex] << " ";
+			}
+
+		
+		curL--;
+		if (curL != 0)
+		{
+			fileVec[file.filesCount - 1].close();
+			fileVec[file.filesCount - 1] = std::fstream(file.fileName[file.filesCount - 1], std::ios::in);
+			
+			fileVec[file.filesCount - 2].close();
+			fileVec[file.filesCount - 2] = std::fstream(file.fileName[file.filesCount - 2], std::ios::out);
+			ShiftFiles(file, fileVec);
+		}
+		
+
+	}
+
+	for (int i = 0; i < file.filesCount; i++)
+		fileVec[i].close();
+	
+}
 
 void PolyphaseSort(FileStruct& file)
 {
@@ -230,9 +210,10 @@ void PolyphaseSort(FileStruct& file)
 	file.ip = new int[file.filesCount];
 	file.ms = new int[file.filesCount];
 	Splitting(file);
-	//Merging(file);
-	
-	//FreeMemory(file.fileName);
+
+	Merging(file);
+	Rename(file);
+	FreeMemory(file.fileName);
 }
 
 int main()
@@ -242,19 +223,8 @@ int main()
 	file.orig = "../../../test.txt";
 	//file.orig = "../../../arr_size_10000_in_range_10.txt";
 	PolyphaseSort(file);
-	std::cout << "\n";
-	std::vector<std::fstream> fileVec;
-	for (int i = 0; i < file.filesCount; i++)
-	{
-		int num;
-		fileVec.push_back(std::fstream(file.fileName[i], std::ios::in));
-		while (fileVec[i] >> num)
-		{
-			std::cout <<num<<" ";
-		}
-		std::cout << "\n";
-	}
-	FreeMemory(file.fileName);
+	
+	
 	
 	return 0;
 }
