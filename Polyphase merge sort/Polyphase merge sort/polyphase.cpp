@@ -8,7 +8,7 @@
 
 struct FileStruct
 {
-	int filesCount = 6;
+	int count = 6;
 	std::string orig;
 	std::string* fileName = nullptr;
 	std::fstream fileStream;
@@ -38,7 +38,7 @@ void FreeMemory(std::string* fileName)
 
 void ShiftFiles(FileStruct& file, std::vector<std::fstream>& fileVec)
 {	
-	for (int i = file.filesCount - 2; i >= 0; --i)
+	for (int i = file.count - 2; i >= 0; --i)
 	{
 		std::swap(file.fileName[i], file.fileName[i + 1]);
 		std::swap(file.ms[i], file.ms[i + 1]);
@@ -49,13 +49,13 @@ void ShiftFiles(FileStruct& file, std::vector<std::fstream>& fileVec)
 void Rename(FileStruct& file)
 {
 	for (int i = 0; i < file.L-1; i++)
-		for(int j=0;j<file.filesCount-1;j++)
+		for(int j=0;j<file.count-1;j++)
 			std::swap(file.fileName[j], file.fileName[j + 1]);
 	for (int k = 0; k < file.L-1; k++)
 	{
-		if (rename(file.fileName[file.filesCount - 1].c_str(), "temp.txt"))
+		if (rename(file.fileName[file.count - 1].c_str(), "temp.txt"))
 			std::cout << "error!";
-		for (int i = file.filesCount - 2; i >= 0; --i)
+		for (int i = file.count - 2; i >= 0; --i)
 			if (rename(file.fileName[i].c_str(), file.fileName[i + 1].c_str()))
 				std::cout << "error!";
 		if (rename("temp.txt", file.fileName[0].c_str()))
@@ -67,7 +67,7 @@ void Rename(FileStruct& file)
 void ipmsForming(FileStruct& file)
 {
 	int ip0 = file.ip[0];
-	for (int k = 0; k < file.filesCount - 1; ++k)
+	for (int k = 0; k < file.count - 1; ++k)
 	{
 		file.ms[k] = file.ip[k + 1] - file.ip[k] + ip0;
 		file.ip[k] = file.ip[k + 1] + ip0;
@@ -77,16 +77,16 @@ void ipmsForming(FileStruct& file)
 
 void Splitting(FileStruct& file)
 {
-	for (int i = 0; i < file.filesCount - 1; ++i)
+	for (int i = 0; i < file.count - 1; ++i)
 	{
 		file.ms[i] = file.ip[i] = 1;
 	}
-	file.ms[file.filesCount - 1] = file.ip[file.filesCount - 1] = 0;
+	file.ms[file.count - 1] = file.ip[file.count - 1] = 0;
 	file.L++;
 
 	file.fileStream = std::fstream(file.orig, std::ios::in);
 	std::vector<std::fstream> fileVec;
-	for (int i = 0; i < file.filesCount - 1; i++)
+	for (int i = 0; i < file.count - 1; i++)
 		fileVec.push_back(std::fstream(file.fileName[i], std::ios::out));
 	
 
@@ -120,7 +120,7 @@ void Splitting(FileStruct& file)
 		}
 	}
 
-	for (int i = 0; i < file.filesCount - 1; i++)
+	for (int i = 0; i < file.count - 1; i++)
 		fileVec[i].close();
 	file.fileStream.close();
 
@@ -134,97 +134,132 @@ int findMinIndex(const std::vector<int>& vec) {
 void Merging(FileStruct& file)
 {
 	std::vector<std::fstream> fileVec;
-	for (int i = 0; i < file.filesCount - 1; i++)
+	for (int i = 0; i < file.count - 1; i++)
 		fileVec.push_back(std::fstream(file.fileName[i], std::ios::in));
-	fileVec.push_back(std::fstream(file.fileName[file.filesCount-1], std::ios::out));
+	fileVec.push_back(std::fstream(file.fileName[file.count-1], std::ios::out));
 	int curL = file.L;
 	while (curL != 0)
 	{
-		
+		int penultimate=0;
+		while (fileVec[file.count - 2]>>penultimate)
+		{
 			bool check = true;
 			int i = 0;
-			for (int i = 0; i < file.filesCount - 1 && check; ++i)
+			for (int i = 0; i < file.count - 1 && check; ++i)
 				if (file.ms[i] == 0)
 					check = false;
 			if (check)
 			{
-				for (int i = 0; i < file.filesCount - 1; ++i)
+				for (int i = 0; i < file.count - 1; ++i)
 					file.ms[i]--;
-				file.ms[file.filesCount - 1]++;
+				file.ms[file.count - 1]++;
 			}
-			//возможно стоит переписать
-			std::vector<int> vec;
-			for (int i = 0; i < file.filesCount - 1; ++i)
+			std::vector<int> vecMerg;
+			for (int i = 0; i < file.count - 2; ++i)
 			{
-				int number= INT_MAX;
+				int number = INT_MAX;
 				if (file.ms[i] == 0)
 				{
 					fileVec[i] >> number;
-					vec.push_back(number);
-					
+					vecMerg.push_back(number);
+
 				}
 				else
 				{
 					file.ms[i]--;
-					vec.push_back(INT_MAX);
+					vecMerg.push_back(INT_MAX);
 				}
 			}
-			
-			int minIndex = findMinIndex(vec);
-			fileVec[file.filesCount - 1] << vec[minIndex]<<" ";
-			int number;
-			while (vec[minIndex] != INT_MAX)
+			if(file.ms[file.count - 2]==0)
+				vecMerg.push_back(penultimate);
+			else
 			{
-				fileVec[minIndex] >> number;
-				vec[minIndex]=number;
-
-				minIndex = findMinIndex(vec);
-				fileVec[file.filesCount - 1] << vec[minIndex] << " ";
+				file.ms[file.count - 2]--;
+				vecMerg.push_back(INT_MAX);
 			}
 
+			int minIndex = findMinIndex(vecMerg);
+			fileVec[file.count - 1] << vecMerg[minIndex] << " ";
+			int number;
+			while (vecMerg[minIndex] != INT_MAX)
+			{
+				fileVec[minIndex] >> number;
+				vecMerg[minIndex] = number;
+
+				minIndex = findMinIndex(vecMerg);
+				fileVec[file.count - 1] << vecMerg[minIndex] << " ";
+			}
+		}
 		
 		curL--;
 		if (curL != 0)
 		{
-			fileVec[file.filesCount - 1].close();
-			fileVec[file.filesCount - 1] = std::fstream(file.fileName[file.filesCount - 1], std::ios::in);
+			fileVec[file.count - 1].close();
+			fileVec[file.count - 1] = std::fstream(file.fileName[file.count - 1], std::ios::in);
 			
-			fileVec[file.filesCount - 2].close();
-			fileVec[file.filesCount - 2] = std::fstream(file.fileName[file.filesCount - 2], std::ios::out);
+			fileVec[file.count - 2].close();
+			fileVec[file.count - 2] = std::fstream(file.fileName[file.count - 2], std::ios::out);
 			ShiftFiles(file, fileVec);
 		}
 		
 
 	}
 
-	for (int i = 0; i < file.filesCount; i++)
+	for (int i = 0; i < file.count; i++)
 		fileVec[i].close();
-	
 }
 
 void PolyphaseSort(FileStruct& file)
 {
-
-	
-	file.fileName = CreateFiles(file.filesCount);
-	file.ip = new int[file.filesCount];
-	file.ms = new int[file.filesCount];
+	file.fileName = CreateFiles(file.count);
+	file.ip = new int[file.count];
+	file.ms = new int[file.count];
 	Splitting(file);
-
 	Merging(file);
 	Rename(file);
 	FreeMemory(file.fileName);
 }
 
+bool isFileSorted(const std::string& filename) 
+{
+	std::ifstream inputFile(filename); 
+
+	if (!inputFile) 
+	{
+		std::cerr << "Error opening file: " << filename << std::endl;
+		return false;
+	}
+
+	int prev;
+
+	if (inputFile >> prev) 
+	{ 
+		int cur;
+		while (inputFile >> cur) 
+		{ 
+			if (cur < prev)
+			{
+				inputFile.close();
+				return false;
+			}
+			prev = cur; 
+		}
+	}
+
+	inputFile.close(); 
+	return true;
+}
 int main()
 {
 	FileStruct file;
-	file.filesCount = 6;
-	file.orig = "../../../test.txt";
-	//file.orig = "../../../arr_size_10000_in_range_10.txt";
+	file.count = 10;
+	//file.orig = "../../../test500.txt";
+	file.orig = "../../../arr_size_100000_in_range_100000.txt";
 	PolyphaseSort(file);
-	
-	
-	
+	std::string s = "file_" + std::to_string(file.count-1) + ".txt";
+	if (isFileSorted(s))
+		std::cout << "Sorted";
+	else
+		std::cout << "Not Sorted";
 	return 0;
 }
