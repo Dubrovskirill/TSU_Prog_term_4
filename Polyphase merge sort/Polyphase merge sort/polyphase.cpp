@@ -143,54 +143,61 @@ void Merging(FileStruct& file)
 		int penultimate=0;
 		while (fileVec[file.count - 2]>>penultimate)
 		{
-			bool check = true;
-			int i = 0;
-			for (int i = 0; i < file.count - 1 && check; ++i)
-				if (file.ms[i] == 0)
-					check = false;
-			if (check)
+			bool rec = false;
+			while (!rec)
 			{
-				for (int i = 0; i < file.count - 1; ++i)
-					file.ms[i]--;
-				file.ms[file.count - 1]++;
-			}
-			std::vector<int> vecMerg;
-			for (int i = 0; i < file.count - 2; ++i)
-			{
-				int number = INT_MAX;
-				if (file.ms[i] == 0)
+				bool check = true;
+				int i = 0;
+				for (int i = 0; i < file.count - 1 && check; ++i)
+					if (file.ms[i] == 0)
+						check = false;
+				if (check)
 				{
-					fileVec[i] >> number;
-					vecMerg.push_back(number);
-
+					for (int i = 0; i < file.count - 1; ++i)
+						file.ms[i]--;
+					file.ms[file.count - 1]++;
 				}
+				std::vector<int> vecMerg;
+				for (int i = 0; i < file.count - 2; ++i)
+				{
+					int number = INT_MAX;
+					if (file.ms[i] == 0)
+					{
+						fileVec[i] >> number;
+						vecMerg.push_back(number);
+
+					}
+					else
+					{
+						file.ms[i]--;
+						vecMerg.push_back(INT_MAX);
+					}
+				}
+				if (file.ms[file.count - 2] == 0)
+				{
+					vecMerg.push_back(penultimate);
+					rec = true;
+				}
+
 				else
 				{
-					file.ms[i]--;
+					file.ms[file.count - 2]--;
 					vecMerg.push_back(INT_MAX);
 				}
-			}
-			if(file.ms[file.count - 2]==0)
-				vecMerg.push_back(penultimate);
-			else
-			{
-				file.ms[file.count - 2]--;
-				vecMerg.push_back(INT_MAX);
-			}
 
-			int minIndex = findMinIndex(vecMerg);
-			fileVec[file.count - 1] << vecMerg[minIndex] << " ";
-			int number;
-			while (vecMerg[minIndex] != INT_MAX)
-			{
-				fileVec[minIndex] >> number;
-				vecMerg[minIndex] = number;
-
-				minIndex = findMinIndex(vecMerg);
-				fileVec[file.count - 1] << vecMerg[minIndex] << " ";
+				int minIndex = findMinIndex(vecMerg);
+				
+				int number;
+				while (vecMerg[minIndex] != INT_MAX)
+				{
+					fileVec[file.count - 1] << vecMerg[minIndex] << " ";
+					fileVec[minIndex] >> number;
+					vecMerg[minIndex] = number;
+					minIndex = findMinIndex(vecMerg);
+				}
+				fileVec[file.count - 1] << INT_MAX << " ";
 			}
 		}
-		
 		curL--;
 		if (curL != 0)
 		{
@@ -249,17 +256,36 @@ bool isFileSorted(const std::string& filename)
 	inputFile.close(); 
 	return true;
 }
+
+int countNumbersInFile(const std::string& filename) {
+	std::ifstream file(filename);
+	int count = 0;
+	int number;
+
+	while (file >> number) {
+		count++;
+	}
+
+	file.close();
+	return count;
+}
+
 int main()
 {
 	FileStruct file;
 	file.count = 10;
-	//file.orig = "../../../test500.txt";
-	file.orig = "../../../arr_size_100000_in_range_100000.txt";
+	//file.orig = "../../../test100.txt";
+	
+	file.orig = "../../../arr_size_1000000_in_range_100000.txt";
+	std::cout << countNumbersInFile(file.orig) << "\n";
 	PolyphaseSort(file);
 	std::string s = "file_" + std::to_string(file.count-1) + ".txt";
 	if (isFileSorted(s))
 		std::cout << "Sorted";
 	else
 		std::cout << "Not Sorted";
+
+	
+	std::cout << "\n" << countNumbersInFile(s);
 	return 0;
 }
