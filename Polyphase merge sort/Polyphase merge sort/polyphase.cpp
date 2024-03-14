@@ -15,6 +15,7 @@ struct FileStruct
 	int* ip = nullptr;
 	int* ms = nullptr;
 	int L = 0;
+	int countINT_MAX = 0;
 
 };
 
@@ -60,8 +61,7 @@ void Rename(FileStruct& file)
 				std::cout << "error!";
 		if (rename("temp.txt", file.fileName[0].c_str()))
 			std::cout << "error!";
-	}
-	
+	}	
 }
 
 void ipmsForming(FileStruct& file)
@@ -75,6 +75,18 @@ void ipmsForming(FileStruct& file)
 	file.L++;
 }
 
+void PrintMS(FileStruct& file)
+{
+	for (int i = 0; i < file.count; i++)
+		std::cout << file.ip[i] << " ";
+	std::cout << "      ";
+
+	for (int i = 0; i < file.count; i++)
+		std::cout << file.ms[i] << " ";
+	std::cout << std::endl;
+
+}
+
 void Splitting(FileStruct& file)
 {
 	for (int i = 0; i < file.count - 1; ++i)
@@ -84,23 +96,24 @@ void Splitting(FileStruct& file)
 	file.ms[file.count - 1] = file.ip[file.count - 1] = 0;
 	file.L++;
 
-	file.fileStream = std::fstream(file.orig, std::ios::in);
 	std::vector<std::fstream> fileVec;
 	for (int i = 0; i < file.count - 1; i++)
 		fileVec.push_back(std::fstream(file.fileName[i], std::ios::out));
 	
-
 	int i = 0;
 	int number = INT_MIN;
 	int prev = INT_MIN;
-	
 	
 	while(!file.fileStream.eof())
 	{
 		while (file.fileStream >> number && prev <= number)
 		{
-			fileVec[i] << number << " ";
-			prev = number;
+			if (number != INT_MAX)
+			{
+				fileVec[i] << number << " ";
+				prev = number;
+			}
+			else file.countINT_MAX++;
 		}
 		fileVec[i] << INT_MAX << " ";
 		--file.ms[i];
@@ -115,20 +128,42 @@ void Splitting(FileStruct& file)
 		else i = 0;
 		if (file.fileStream)
 		{
-			fileVec[i] << number << " ";
-			prev = number;
+			if (number != INT_MAX)
+			{
+				fileVec[i] << number << " ";
+				prev = number;
+			}
+			else file.countINT_MAX++;
 		}
 	}
 
 	for (int i = 0; i < file.count - 1; i++)
 		fileVec[i].close();
-	file.fileStream.close();
-
 }
 
 int findMinIndex(const std::vector<int>& vec) {
 	auto minIt = std::min_element(vec.begin(), vec.end());
 	return std::distance(vec.begin(), minIt);
+}
+
+void Recording(FileStruct& file, std::vector<int> &vecMerg, std::vector<std::fstream>& fileVec, int number)
+{
+	for (int i = 0; i < file.count - 2; ++i)
+	{
+		int number = INT_MAX;
+		if (file.ms[i] == 0)
+		{
+			fileVec[i] >> number;
+			vecMerg.push_back(number);
+
+		}
+		else
+		{
+			file.ms[i]--;
+			vecMerg.push_back(INT_MAX);
+		}
+	}
+	vecMerg.push_back(number);
 }
 
 void Merging(FileStruct& file)
@@ -140,64 +175,46 @@ void Merging(FileStruct& file)
 	int curL = file.L;
 	while (curL != 0)
 	{
-		int penultimate=0;
-		while (fileVec[file.count - 2]>>penultimate)
+		while (fileVec[file.count - 2])
 		{
-			bool rec = false;
-			while (!rec)
+			bool mergeFictive = true;
+			int i = 0;
+			for (int i = 0; i < file.count - 1 && mergeFictive; ++i)
 			{
-				bool check = true;
-				int i = 0;
-				for (int i = 0; i < file.count - 1 && check; ++i)
-					if (file.ms[i] == 0)
-						check = false;
-				if (check)
-				{
-					for (int i = 0; i < file.count - 1; ++i)
-						file.ms[i]--;
-					file.ms[file.count - 1]++;
-				}
-				std::vector<int> vecMerg;
-				for (int i = 0; i < file.count - 2; ++i)
-				{
-					int number = INT_MAX;
-					if (file.ms[i] == 0)
-					{
-						fileVec[i] >> number;
-						vecMerg.push_back(number);
-
-					}
-					else
-					{
-						file.ms[i]--;
-						vecMerg.push_back(INT_MAX);
-					}
-				}
-				if (file.ms[file.count - 2] == 0)
-				{
-					vecMerg.push_back(penultimate);
-					rec = true;
-				}
-
-				else
-				{
-					file.ms[file.count - 2]--;
-					vecMerg.push_back(INT_MAX);
-				}
-
-				int minIndex = findMinIndex(vecMerg);
-				
-				int number;
-				while (vecMerg[minIndex] != INT_MAX)
-				{
-					fileVec[file.count - 1] << vecMerg[minIndex] << " ";
-					fileVec[minIndex] >> number;
-					vecMerg[minIndex] = number;
-					minIndex = findMinIndex(vecMerg);
-				}
-				if(curL!=1)
-					fileVec[file.count - 1] << INT_MAX << " ";//how not to record the last element?
+				if (file.ms[i] == 0)
+					mergeFictive = false;
 			}
+			if (mergeFictive)
+			{
+				for (int i = 0; i < file.count - 1; ++i)
+					file.ms[i]--;
+				file.ms[file.count - 1]++;
+			}
+
+			std::vector<int> vecMerg;
+			int number =INT_MAX;
+			if (file.ms[file.count - 2] == 0)
+			{
+				fileVec[file.count - 2] >> number;
+				if (!fileVec[file.count - 2])
+					break;
+			}
+			else file.ms[file.count - 2]--;
+			Recording(file, vecMerg, fileVec, number);
+
+			int minIndex = findMinIndex(vecMerg);
+			while (vecMerg[minIndex] != INT_MAX)
+			{
+				fileVec[file.count - 1] << vecMerg[minIndex] << " ";
+				fileVec[minIndex] >> number;
+				vecMerg[minIndex] = number;
+				minIndex = findMinIndex(vecMerg);
+			}
+			if (curL!=1)
+				fileVec[file.count - 1] << INT_MAX << " ";
+			else for(int i=0;i<file.countINT_MAX;i++)
+				fileVec[file.count - 1] << INT_MAX << " ";
+			
 		}
 		curL--;
 		if (curL != 0)
@@ -209,21 +226,31 @@ void Merging(FileStruct& file)
 			fileVec[file.count - 2] = std::fstream(file.fileName[file.count - 2], std::ios::out);
 			ShiftFiles(file, fileVec);
 		}
-		//overwrite the file?
 	}
 	for (int i = 0; i < file.count; i++)
 		fileVec[i].close();
 }
 
-void PolyphaseSort(FileStruct& file)
+std::string PolyphaseSort(std::string f, int count = 3)
 {
-	file.fileName = CreateFiles(file.count);
-	file.ip = new int[file.count];
-	file.ms = new int[file.count];
-	Splitting(file);
-	Merging(file);
-	Rename(file);
-	FreeMemory(file.fileName);
+	FileStruct file;
+	file.count = count;
+	file.orig = f;
+	file.fileStream = std::fstream(file.orig, std::ios::in);
+	if (file.fileStream.is_open() && count >= 3)
+	{
+		file.fileName = CreateFiles(file.count);
+		file.ip = new int[file.count];
+		file.ms = new int[file.count];
+		Splitting(file);
+		Merging(file);
+		Rename(file);
+		FreeMemory(file.fileName);
+		file.fileStream.close();
+		return "file_" + std::to_string(file.count-1) + ".txt";
+	}
+	file.fileStream.close();
+	return file.orig;
 }
 
 bool isFileSorted(const std::string& filename) 
@@ -231,13 +258,8 @@ bool isFileSorted(const std::string& filename)
 	std::ifstream inputFile(filename); 
 
 	if (!inputFile) 
-	{
-		std::cerr << "Error opening file: " << filename << std::endl;
 		return false;
-	}
-
 	int prev;
-
 	if (inputFile >> prev) 
 	{ 
 		int cur;
@@ -251,7 +273,6 @@ bool isFileSorted(const std::string& filename)
 			prev = cur; 
 		}
 	}
-
 	inputFile.close(); 
 	return true;
 }
@@ -261,9 +282,8 @@ int countNumbersInFile(const std::string& filename) {
 	int count = 0;
 	int number;
 
-	while (file >> number) {
+	while (file >> number) 
 		count++;
-	}
 
 	file.close();
 	return count;
@@ -271,17 +291,17 @@ int countNumbersInFile(const std::string& filename) {
 
 int main()
 {
-	FileStruct file;
-	file.count = 10;
-	file.orig = "../../../test500.txt";
-	//file.orig = "../../../arr_size_1000000_in_range_100000.txt";
-	std::cout << countNumbersInFile(file.orig) << "\n";
-	PolyphaseSort(file);
-	std::string s = "file_" + std::to_string(file.count-1) + ".txt";
-	if (isFileSorted(s))
+	
+	int count = 100;
+	std::string f = "../../../arr_size_1000000_in_range_100000.txt";
+	std::string s = PolyphaseSort(f, count);
+	if(s==f)
+		std::cout << "File opening error";
+	else if (isFileSorted(s))
 		std::cout << "Sorted";
 	else
 		std::cout << "Not Sorted";
-	std::cout << "\n" << countNumbersInFile(s);
+	std::cout << std::endl;
+	
 	return 0;
 }
