@@ -195,7 +195,8 @@ void Merging(FileStruct& file)
 					vecMerg[minIndex] = number;
 					minIndex = findMinIndex(vecMerg);
 				}
-				fileVec[file.count - 1] << INT_MAX << " ";
+				if(curL!=1)
+					fileVec[file.count - 1] << INT_MAX << " ";//how not to record the last element?
 			}
 		}
 		curL--;
@@ -208,10 +209,8 @@ void Merging(FileStruct& file)
 			fileVec[file.count - 2] = std::fstream(file.fileName[file.count - 2], std::ios::out);
 			ShiftFiles(file, fileVec);
 		}
-		
-
+		//overwrite the file?
 	}
-
 	for (int i = 0; i < file.count; i++)
 		fileVec[i].close();
 }
@@ -274,9 +273,8 @@ int main()
 {
 	FileStruct file;
 	file.count = 10;
-	//file.orig = "../../../test100.txt";
-	
-	file.orig = "../../../arr_size_1000000_in_range_100000.txt";
+	file.orig = "../../../test500.txt";
+	//file.orig = "../../../arr_size_1000000_in_range_100000.txt";
 	std::cout << countNumbersInFile(file.orig) << "\n";
 	PolyphaseSort(file);
 	std::string s = "file_" + std::to_string(file.count-1) + ".txt";
@@ -284,8 +282,6 @@ int main()
 		std::cout << "Sorted";
 	else
 		std::cout << "Not Sorted";
-
-	
 	std::cout << "\n" << countNumbersInFile(s);
 	return 0;
 }
