@@ -20,7 +20,19 @@ public:
    void TreeToList(std::list<Node*>& nodeList) const;
    BinaryTree copy(Node *root) const;
    BinaryTree copy() const;
+   bool isBalanced() const;
+   bool isBalanced(Node* root) const;
+   bool isEmpty() const;
+   int height() const;
+   int height(Node* root) const;
+   int nodeCount() const;
+   Node* root() const;
+   virtual Node* add(const int key);
+   Node* find(const int key) const;
+   virtual Node* find(Node* root, const int key) const;
 
+protected:
+   virtual BinaryTree::Node* _addNode(Node* root, const int key);
 private:
 
    Node* _copy(Node* root) const;

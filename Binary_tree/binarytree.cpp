@@ -84,6 +84,112 @@ void BinaryTree::TreeToList(std::list<Node*>& nodeList) const
     }
 }
 
+bool BinaryTree::isBalanced() const
+{
+    return isBalanced(m_root);
+}
+
+bool BinaryTree::isBalanced(Node* root) const
+{
+    if (!root)
+        return true;
+    int left = height(root->getLeft());
+    int right = height(root->getRight());
+    int difference = right - left;
+    bool balanced = (difference <= 1 && difference >= -1);
+    return balanced && isBalanced(root->getLeft()) && isBalanced(root->getRight());
+}
+
+bool BinaryTree::isEmpty() const
+{
+    return m_root == nullptr;
+}
+
+int BinaryTree::height() const
+{
+    return height(m_root);
+}
+
+int BinaryTree::height(Node* root) const
+{
+    if (!root)
+        return 0;
+    else
+    {
+        int leftHeight = height(root->getLeft());
+        int rightHeight = height(root->getRight());
+        return std::max(leftHeight, rightHeight) + 1;
+    }
+}
+
+int BinaryTree::nodeCount() const
+{
+    int result = 0;
+    if (!m_root)
+        return result;
+    std::list<Node*> listNode;
+    listNode.push_back(m_root);
+    TreeToList(listNode);
+    result = listNode.size();
+    return result;
+}
+
+BinaryTree::Node* BinaryTree::root() const
+{
+    return m_root;
+}
+
+BinaryTree::Node* BinaryTree::add(const int key)
+{
+    if (m_root) {
+        return _addNode(m_root, key);
+    }
+    else {
+        return m_root = new Node(key);
+    }
+}
+
+BinaryTree::Node* BinaryTree::_addNode(Node* root, int key)
+{
+    if (!root) {
+        root = new Node(key);
+    }
+    else if (rand() % 2) {
+        root->setLeft(_addNode(root->getLeft(), key));
+    }
+    else {
+        root->setRight(_addNode(root->getRight(), key));
+    }
+
+    return root;
+}
+
+BinaryTree::Node* BinaryTree::find(const int key) const
+{
+    return find(m_root, key);
+}
+
+BinaryTree::Node* BinaryTree::find(Node* root, const int key) const
+{
+    if (!root)
+        return nullptr;
+
+    if (root->getKey() == key)
+        return root;
+    else
+    {
+        Node* node = find(root->getLeft(), key);
+        if (!node)
+            node = find(root->getRight(), key);
+        return node;
+    }
+}
+
+
+
+
+
+
 
 int BinaryTree::Node::getKey() const
 {
