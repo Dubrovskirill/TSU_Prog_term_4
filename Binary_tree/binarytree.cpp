@@ -185,7 +185,37 @@ BinaryTree::Node* BinaryTree::find(Node* root, const int key) const
     }
 }
 
+int BinaryTree::min() const
+{
+    if (!m_root)
+        return INT_MIN;
+    std::vector<int> vec = TreeToVector();
+    return vec[0];
+}
 
+int BinaryTree::max() const
+{
+    if (!m_root)
+        return INT_MAX;
+    std::vector<int> vec = TreeToVector();
+    return vec.back();
+}
+
+int BinaryTree::Level(const int key) const
+{
+    return Level(m_root, key, 1);
+}
+
+int BinaryTree::Level(Node* root, const int key, int currentLevel) const
+{
+    if (!root)
+        return -1;
+    if (root->getKey() == key)
+        return currentLevel;
+    int downLevel = Level(root->getLeft(), key, currentLevel + 1);
+    if (downLevel == -1)
+        return Level(root->getRight(), key, currentLevel + 1);
+}
 
 
 

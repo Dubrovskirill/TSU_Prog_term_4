@@ -31,6 +31,12 @@ public:
    Node* find(const int key) const;
    virtual Node* find(Node* root, const int key) const;
 
+   int min() const;
+   int max() const;
+   std::vector<int> TreeToVector()const;
+   int Level(const int key) const;
+   int Level(Node* root, const int key, int currentLevel) const;
+
 protected:
    virtual BinaryTree::Node* _addNode(Node* root, const int key);
 private:
