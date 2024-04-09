@@ -3,22 +3,36 @@
 
 BinaryTree::BinaryTree(const BinaryTree& other)
 {
-    m_root = other.copy();
+    m_root = other._copy();
 }
 
-BinaryTree::Node* BinaryTree::copy() const
+BinaryTree BinaryTree::copy() const
 {
     return copy(m_root);
 }
 
-BinaryTree::Node* BinaryTree::copy(Node* root) const
+BinaryTree BinaryTree::copy(Node* root) const
+{
+    if (!root)
+        return *this;
+    BinaryTree cloneTree;
+    cloneTree.m_root = _copy(root);
+    return cloneTree;
+}
+
+BinaryTree::Node* BinaryTree::_copy() const
+{
+    return _copy(m_root);
+}
+
+BinaryTree::Node* BinaryTree::_copy(Node* root) const
 {
     Node* cloneRoot = nullptr;
     if (!root)
         return cloneRoot;
     cloneRoot = new Node(root->getKey());
-    cloneRoot->setLeft(copy(root->getLeft()));
-    cloneRoot->setRight(copy(root->getRight()));
+    cloneRoot->setLeft(_copy(root->getLeft()));
+    cloneRoot->setRight(_copy(root->getRight()));
     return cloneRoot;
 }
 

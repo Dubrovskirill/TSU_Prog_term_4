@@ -18,10 +18,13 @@ public:
    void clearChildren(Node *root);
    void clear();
    void TreeToList(std::list<Node*>& nodeList) const;
-   Node* copy(Node* root) const;
-   Node* copy() const;
+   BinaryTree copy(Node *root) const;
+   BinaryTree copy() const;
 
 private:
+
+   Node* _copy(Node* root) const;
+   Node* _copy() const;
     Node* m_root = nullptr;
 
 };
