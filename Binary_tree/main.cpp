@@ -1,11 +1,9 @@
 #include "binarytree.h"
 
-#include <QApplication>
 
-int main(int argc, char *argv[])
+
+int main()
 {
-    QApplication a(argc, argv);
-    BinaryTree w;
-    w.show();
-    return a.exec();
+
+    return 0;
 }
