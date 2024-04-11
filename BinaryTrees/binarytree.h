@@ -16,45 +16,51 @@ public:
    BinaryTree() = default;
    BinaryTree(const BinaryTree& other);
    ~BinaryTree() {clear();}
+
    void clearChildren(Node *root);
    void clear();
+
    int size() const;
-   void TreeToList(std::list<Node*>& nodeList) const;
+   int min() const;
+   int max() const;
+   int height() const;
+   int height(Node* root) const;
+   int nodeCount() const;
+   int level(const int key) const;
+   int level(Node* root, const int key, int currentLevel) const;
+
    BinaryTree copy(Node *root) const;
    BinaryTree copy() const;
    bool isBalanced() const;
    bool isBalanced(Node* root) const;
    bool isEmpty() const;
-   int height() const;
-   int height(Node* root) const;
-   int nodeCount() const;
+  
    Node* root() const;
-   virtual Node* add(const int key);
    Node* find(const int key) const;
-   virtual Node* find(Node* root, const int key) const;
-   int min() const;
-   int max() const;
-   std::vector<int> TreeToVector()const;
-   void printHorizontal(Node *root, int marginLeft, int levelSpacing) const;
-   void printHorizontal() const;
-   void print(Node *root, int leftBorderPos=10, int rightBorderPo=100, int yPos=10) const;
-   void print() const;
-   void moveCursor(int xPos, int yPos ) const;
-   void printLeafs() const;
-   std::vector<Node*> leafsVector() const;
-   int level(const int key) const;
-   int level(Node* root, const int key, int currentLevel) const;
-   bool remove(const int key);
-   bool removeRootNode(Node* node);
-   bool removeLeafNode(Node* node);
-   bool removeNodeWithTwoChildren(Node* node);
-   bool removeNodeWithOneChild(Node* node);
-   Node* findReplacementNode();
-   void getLeafs(Node* node, std::vector<Node*>& leafs);
    Node* parent(const Node* child) const;
+   virtual Node* find(Node* root, const int key) const;
+   virtual Node* add(const int key);
+   bool remove(const int key);
+
+   void printHorizontal(Node* root, int marginLeft, int levelSpacing) const;
+   void printHorizontal() const;
+   void print(Node* root, int leftBorderPos = 10, int rightBorderPo = 100, int yPos = 10) const;
+   void print() const;
+   void moveCursor(int xPos, int yPos) const;
+   void printLeafs() const;
+   void getLeafs(Node* node, std::vector<Node*>& leafs);
+   void nodeList(std::list<Node*>& nodeList) const;
+   std::vector<int> keysVector()const;
+   std::vector<Node*> leafsVector() const;
 
    BinaryTree& operator=(const BinaryTree& other);
-
+  
+   
+private:
+    bool removeRootNode(Node* node);
+    bool removeLeafNode(Node* node);
+    bool removeNodeWithTwoChildren(Node* node);
+    bool removeNodeWithOneChild(Node* node);
 
 protected:
    virtual BinaryTree::Node* _addNode(Node* root, const int key);
@@ -75,7 +81,7 @@ public:
         : m_key(key), m_left(left), m_right(right)
     {}
     ~Node() = default;
-    int key() const;
+
     int getKey() const;
     void setKey(int key);
     Node* getLeft();

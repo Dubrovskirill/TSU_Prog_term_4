@@ -53,7 +53,7 @@ void BinaryTree::clearChildren(Node *root)
         listForClearNode.push_back(root->getLeft());
     if (root->getRight())
         listForClearNode.push_back(root->getRight());
-    TreeToList(listForClearNode);
+    nodeList(listForClearNode);
     while (!listForClearNode.empty())
     {
         delete listForClearNode.back();
@@ -69,7 +69,7 @@ void BinaryTree::clear()
     delete m_root;
     m_root = nullptr;
 }
-void BinaryTree::TreeToList(std::list<Node*>& nodeList) const
+void BinaryTree::nodeList(std::list<Node*>& nodeList) const
 {
     Node* current = nullptr;
     std::list<Node*> tmp;
@@ -137,7 +137,7 @@ int BinaryTree::nodeCount() const
         return result;
     std::list<Node*> listNode;
     listNode.push_back(m_root);
-    TreeToList(listNode);
+    nodeList(listNode);
     result = listNode.size();
     return result;
 }
@@ -197,7 +197,7 @@ int BinaryTree::min() const
 {
     if (!m_root)
         return INT_MIN;
-    std::vector<int> vec = TreeToVector();
+    std::vector<int> vec = keysVector();
     return vec[0];
 }
 
@@ -205,22 +205,22 @@ int BinaryTree::max() const
 {
     if (!m_root)
         return INT_MAX;
-    std::vector<int> vec = TreeToVector();
+    std::vector<int> vec = keysVector();
     return vec.back();
 }
 
-std::vector<int> BinaryTree::TreeToVector()const //keysVector
+std::vector<int> BinaryTree::keysVector()const //keysVector
 {
-    std::list<Node*> nodeList;
+    std::list<Node*> nodeL;
     std::vector<int> vec;
     if (!m_root)
         return vec;
-    nodeList.push_back(m_root);
-    TreeToList(nodeList); //NodeList
-    while (!nodeList.empty())
+    nodeL.push_back(m_root);
+    nodeList(nodeL); //NodeList
+    while (!nodeL.empty())
     {
-        vec.push_back(nodeList.front()->getKey());
-        nodeList.pop_front();
+        vec.push_back(nodeL.front()->getKey());
+        nodeL.pop_front();
     }
     std::sort(begin(vec),end(vec));
     return vec;
@@ -280,17 +280,17 @@ void BinaryTree::printLeafs() const
 
 std::vector<BinaryTree::Node*> BinaryTree::leafsVector() const
 {
-    std::list<Node*> nodeList;
+    std::list<Node*> nodeL;
     std::vector<Node*> leafs;
-    nodeList.push_back(m_root);
-    TreeToList(nodeList);
-    while (!nodeList.empty())
+    nodeL.push_back(m_root);
+    nodeList(nodeL);
+    while (!nodeL.empty())
     {
-        if (!nodeList.front()->getLeft() && !nodeList.front()->getRight())
+        if (!nodeL.front()->getLeft() && !nodeL.front()->getRight())
         {
-            leafs.push_back(nodeList.front());
+            leafs.push_back(nodeL.front());
         }
-        nodeList.pop_front();
+        nodeL.pop_front();
     }
     return leafs;
 }
@@ -318,12 +318,12 @@ BinaryTree::Node* BinaryTree::parent(const Node* child) const
     if (m_root == child)
         return m_root;
     Node* current = nullptr;
-    std::list<Node*> nodeList;
-    nodeList.push_back(m_root);
-    TreeToList(nodeList);
-    while (!nodeList.empty())
+    std::list<Node*> nodeL;
+    nodeL.push_back(m_root);
+    nodeList(nodeL);
+    while (!nodeL.empty())
     {
-        current = nodeList.front();
+        current = nodeL.front();
         if (current->getLeft() == child)
         {
             return current;
@@ -332,7 +332,7 @@ BinaryTree::Node* BinaryTree::parent(const Node* child) const
         {
             return current;
         }
-        nodeList.pop_front();
+        nodeL.pop_front();
     }
     return nullptr;
 }
@@ -357,7 +357,7 @@ bool BinaryTree::removeRootNode(Node* node)
 {
     std::list<Node*> listTree;
     listTree.push_back(node);
-    TreeToList(listTree);
+    nodeList(listTree);
     Node* replacementNode = nullptr;
     Node* parentNode = nullptr;
     if (!node->getLeft() && !node->getRight())
@@ -372,12 +372,14 @@ bool BinaryTree::removeRootNode(Node* node)
         parentNode->setLeft(nullptr);
     else if(parentNode->getRight() == replacementNode)
         parentNode->setRight(nullptr);
-    //TODO: swap replacement and node
-    //node->setKey(replacementNode->getKey());
+    replacementNode->setLeft(node->m_left);
+    replacementNode->setRight(node->m_right);
     delete node;
     m_root = replacementNode;
     return true;
 }
+
+
 
 bool BinaryTree::removeLeafNode(Node* node)
 {
@@ -426,18 +428,6 @@ bool BinaryTree::removeNodeWithOneChild(Node* node)
         parentNode->setRight(replacementNode);
     delete node;
     return true;
-}
-
-BinaryTree::Node* BinaryTree::findReplacementNode()
-{
-    Node* currentNode = m_root;
-    Node* replacementNode = nullptr;
-    while (currentNode != nullptr)
-    {
-        replacementNode = currentNode;
-        currentNode = currentNode->getLeft();
-    }
-    return replacementNode;
 }
 
 void BinaryTree::getLeafs(Node* node, std::vector<Node*>& leafs)
@@ -496,23 +486,23 @@ void BinaryTree::Node::setRight(Node* right)
 
 std::vector<BinaryTree::Node*> BinaryTree::_leafs(Node* root) const
 {
-    std::list<Node*> nodeList;
+    std::list<Node*> nodeL;
     std::vector<Node*> leafs;
-    nodeList.push_back(root);
-    TreeToList(nodeList);
-    while (!nodeList.empty())
+    nodeL.push_back(root);
+    nodeList(nodeL);
+    while (!nodeL.empty())
     {
-        if (!nodeList.front()->getLeft() && !nodeList.front()->getRight())
+        if (!nodeL.front()->getLeft() && !nodeL.front()->getRight())
         {
-            leafs.push_back(nodeList.front());
+            leafs.push_back(nodeL.front());
         }
-        nodeList.pop_front();
+        nodeL.pop_front();
     }
     return leafs;
 }
 
 int BinaryTree::size() const
 {
-    std::vector<int> vec = TreeToVector();
+    std::vector<int> vec = keysVector();
     return vec.size();
 }
