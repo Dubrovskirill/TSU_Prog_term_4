@@ -4,20 +4,21 @@
 #include <iostream>
 #include <vector>
 #include <list>
-#include <windows.h>
 
 
 
 class BinaryTree
 {
 
-class Node;
+
 public:
+   class Node;
    BinaryTree() = default;
    BinaryTree(const BinaryTree& other);
    ~BinaryTree() {clear();}
    void clearChildren(Node *root);
    void clear();
+   int size() const;
    void TreeToList(std::list<Node*>& nodeList) const;
    BinaryTree copy(Node *root) const;
    BinaryTree copy() const;
@@ -31,7 +32,6 @@ public:
    virtual Node* add(const int key);
    Node* find(const int key) const;
    virtual Node* find(Node* root, const int key) const;
-
    int min() const;
    int max() const;
    std::vector<int> TreeToVector()const;
@@ -45,7 +45,7 @@ public:
    int level(const int key) const;
    int level(Node* root, const int key, int currentLevel) const;
    bool remove(const int key);
-   bool removeRootNode();
+   bool removeRootNode(Node* node);
    bool removeLeafNode(Node* node);
    bool removeNodeWithTwoChildren(Node* node);
    bool removeNodeWithOneChild(Node* node);
