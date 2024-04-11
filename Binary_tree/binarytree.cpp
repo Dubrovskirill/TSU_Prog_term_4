@@ -1,5 +1,12 @@
+#undef max
 #include "binarytree.h"
-#include "ui_binarytree.h"
+
+#include <algorithm>
+#include <list>
+#include <vector>
+#include <iostream>
+
+#include <windows.h>
 
 BinaryTree::BinaryTree(const BinaryTree& other)
 {
@@ -201,25 +208,103 @@ int BinaryTree::max() const
     return vec.back();
 }
 
-int BinaryTree::Level(const int key) const
+std::vector<int> BinaryTree::TreeToVector()const
 {
-    return Level(m_root, key, 1);
+    std::list<Node*> nodeList;
+    std::vector<int> vec;
+    if (!m_root)
+        return vec;
+    nodeList.push_back(m_root);
+    TreeToList(nodeList);
+    while (!nodeList.empty())
+    {
+        vec.push_back(nodeList.front()->getKey());
+        nodeList.pop_front();
+    }
+    std::sort(begin(vec),end(vec));
+    return vec;
 }
 
-int BinaryTree::Level(Node* root, const int key, int currentLevel) const
+void BinaryTree::printHorizontal(Node *root, int marginLeft, int levelSpacing) const {
+
+    if (root == nullptr)
+        return;
+
+
+    printHorizontal(root->getRight(), marginLeft + levelSpacing, levelSpacing);
+    std::cout << std::string(marginLeft, ' ') << root->getKey() << std::endl;
+    printHorizontal(root->getLeft(), marginLeft + levelSpacing, levelSpacing);
+}
+
+void BinaryTree::printHorizontal() const
 {
-    if (!root)
-        return -1;
-    if (root->getKey() == key)
-        return currentLevel;
-    int downLevel = Level(root->getLeft(), key, currentLevel + 1);
-    if (downLevel == -1)
-        return Level(root->getRight(), key, currentLevel + 1);
+    printHorizontal(m_root, 4, 4);
+}
+
+void BinaryTree::print() const
+{
+    print(m_root, 0, 8, 0);
+}
+
+void BinaryTree::print(Node *root, int leftBorderPos, int rightBorderPos, int yPos) const
+{
+    if (root == nullptr)
+        return;
+
+
+    int xPos = (leftBorderPos + rightBorderPos) / 2;
+    moveCursor(xPos, yPos) ;
+    std::cout << root->getKey();
+
+    print(root->getLeft(), leftBorderPos, xPos, yPos + 15);
+    print(root->getRight(), xPos, rightBorderPos, yPos + 15);
+}
+
+void BinaryTree::moveCursor(int xPos,int yPos  ) const
+{
+    COORD coord;
+    coord.X = xPos;
+    coord.Y = yPos;
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+}
+
+void BinaryTree::printLeafs() const
+{
+    std::vector<Node*> vectorLeafs = leafsVector();
+    for (Node* leafs : vectorLeafs)
+    {
+        std::cout << leafs->getKey() << " ";
+    }
+}
+
+std::vector<BinaryTree::Node*> BinaryTree::leafsVector() const
+{
+    std::list<Node*> nodeList;
+    std::vector<Node*> leafs;
+    nodeList.push_back(m_root);
+    TreeToList(nodeList);
+    while (!nodeList.empty())
+    {
+        if (!nodeList.front()->getLeft() && !nodeList.front()->getRight())
+        {
+            leafs.push_back(nodeList.front());
+        }
+        nodeList.pop_front();
+    }
+    return leafs;
 }
 
 
 
 
+BinaryTree& BinaryTree::operator=(const BinaryTree& other)
+{
+    if (m_root == other.m_root)
+        return *this;
+    clear();
+    m_root = other._copy(other.m_root);
+    return* this;
+}
 
 int BinaryTree::Node::getKey() const
 {

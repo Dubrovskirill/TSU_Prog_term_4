@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <list>
+#include <windows.h>
 
 
 
@@ -34,8 +35,15 @@ public:
    int min() const;
    int max() const;
    std::vector<int> TreeToVector()const;
-   int Level(const int key) const;
-   int Level(Node* root, const int key, int currentLevel) const;
+   void printHorizontal(Node *root, int marginLeft, int levelSpacing) const;
+   void printHorizontal() const;
+   void print(Node *root, int leftBorderPos=10, int rightBorderPo=100, int yPos=10) const;
+   void print() const;
+   void moveCursor(int xPos, int yPos ) const;
+   void printLeafs() const;
+   std::vector<Node*> leafsVector() const;
+
+   BinaryTree& operator=(const BinaryTree& other);
 
 protected:
    virtual BinaryTree::Node* _addNode(Node* root, const int key);
@@ -43,7 +51,7 @@ private:
 
    Node* _copy(Node* root) const;
    Node* _copy() const;
-    Node* m_root = nullptr;
+   Node* m_root = nullptr;
 
 };
 
