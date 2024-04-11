@@ -42,13 +42,24 @@ public:
    void moveCursor(int xPos, int yPos ) const;
    void printLeafs() const;
    std::vector<Node*> leafsVector() const;
+   int level(const int key) const;
+   int level(Node* root, const int key, int currentLevel) const;
+   bool remove(const int key);
+   bool removeRootNode();
+   bool removeLeafNode(Node* node);
+   bool removeNodeWithTwoChildren(Node* node);
+   bool removeNodeWithOneChild(Node* node);
+   Node* findReplacementNode();
+   void getLeafs(Node* node, std::vector<Node*>& leafs);
+   Node* parent(const Node* child) const;
 
    BinaryTree& operator=(const BinaryTree& other);
+
 
 protected:
    virtual BinaryTree::Node* _addNode(Node* root, const int key);
 private:
-
+   std::vector<BinaryTree::Node*> _leafs(Node* root) const;
    Node* _copy(Node* root) const;
    Node* _copy() const;
    Node* m_root = nullptr;
