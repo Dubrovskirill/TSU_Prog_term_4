@@ -7,6 +7,7 @@
 
 
 
+
 class BinaryTree
 {
 
@@ -55,6 +56,14 @@ public:
 
    BinaryTree& operator=(const BinaryTree& other);
   
+   
+   void print_2(Node* root,int level, int xPos, int yPos, int xShift) const;
+   void print_2(Node* root) const;
+  
+   void printSpaces(int count);
+   void print_3(Node* root);
+
+
    
 private:
     bool removeRootNode(Node* node);

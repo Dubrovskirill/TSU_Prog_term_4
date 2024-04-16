@@ -5,6 +5,8 @@
 #include <vector>
 #include <iostream>
 #include <windows.h>
+#include <queue>
+#include <iomanip>
 #undef max
 #undef min
 
@@ -244,30 +246,10 @@ void BinaryTree::printHorizontal() const
 
 void BinaryTree::print() const
 {
-    print(m_root, 0, 8, 0);
+    print(m_root, 0, 30, 0);
 }
 
-void BinaryTree::print(Node *root, int leftBorderPos, int rightBorderPos, int yPos) const
-{
-    if (root == nullptr)
-        return;
 
-
-    int xPos = (leftBorderPos + rightBorderPos) / 2;
-    moveCursor(xPos, yPos) ;
-    std::cout << root->getKey();
-
-    print(root->getLeft(), leftBorderPos, xPos, yPos + 15);
-    print(root->getRight(), xPos, rightBorderPos, yPos + 15);
-}
-//не работает
-void BinaryTree::moveCursor(int xPos,int yPos  ) const
-{
-    COORD coord;
-    coord.X = xPos;
-    coord.Y = yPos;
-    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
-}
 
 void BinaryTree::printLeafs() const
 {
@@ -506,3 +488,99 @@ int BinaryTree::size() const
     std::vector<int> vec = keysVector();
     return vec.size();
 }
+
+void BinaryTree::print(Node* root, int leftBorderPos, int rightBorderPos, int yPos) const
+{
+    if (root == nullptr)
+        return;
+
+
+    int xPos = (leftBorderPos + rightBorderPos) / 2;
+    moveCursor(xPos, yPos);
+    std::cout << root->getKey() << std::endl;
+
+    print(root->getLeft(), leftBorderPos, xPos, yPos + 15);
+    print(root->getRight(), xPos, rightBorderPos, yPos + 15);
+}
+//не работает
+void BinaryTree::moveCursor(int xPos, int yPos) const
+{
+    COORD coord;
+    coord.X = xPos;
+    coord.Y = yPos;
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+}
+
+
+void BinaryTree::print_2( Node* root, int level, int xPos, int yPos, int xShift) const {
+    if (root == nullptr) 
+        return;
+    
+
+    xPos = xPos + xShift;
+
+    moveCursor(xPos, yPos);
+    std::cout << root->getKey();
+
+    if (root->getLeft()) {
+        print_2(root->getLeft(), level + 1, xPos - xShift, yPos + 2, xShift / 2);
+    }
+
+    if (root->getRight()) {
+        print_2(root->getRight(), level + 1, xPos + xShift, yPos + 2, xShift / 2);
+    }
+}
+
+void BinaryTree::print_2(Node* root) const {
+    print_2(root, 1, 40, 1, 20);
+    std::cout << std::endl;
+}
+
+
+void BinaryTree::printSpaces(int count) 
+{
+    for (int i = 0; i < count; ++i) 
+        std::cout << " ";
+    
+}
+
+// Функция для вывода двоичного дерева
+void BinaryTree::print_3(Node* root)
+{
+    int he = height(root);
+    std::queue<Node*> q;
+    q.push(root);
+
+    int levelNodes = 1;
+    int level = 0;
+    int maxLevelWidth = pow(2, he) - 1;
+
+        while (!q.empty() && level <= he) {
+            int width = maxLevelWidth / pow(2, level);
+            int padding = width / 2;
+            printSpaces(padding);
+
+            for (int i = 0; i < levelNodes; ++i) {
+                Node* current = q.front();
+                q.pop();
+                if (current != nullptr) {
+                    std::cout << current->getKey();
+                    q.push(current->getLeft());
+                    q.push(current->getRight());
+                }
+                else {
+                    std::cout << " ";
+                    q.push(nullptr);
+                    q.push(nullptr);
+                }
+                printSpaces(width); // Увеличиваем отступ между узлами
+
+            }
+                std::cout << std::endl;
+
+                levelNodes *= 2;
+                ++level;
+            
+        }
+}       
+
