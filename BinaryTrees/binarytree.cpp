@@ -543,7 +543,7 @@ void BinaryTree::printSpaces(int count)
         std::cout << " "; 
 }
 
-// Функция для вывода двоичного дерева
+
 void BinaryTree::print_3(Node* root)
 {
     int he = height(root);
@@ -572,7 +572,7 @@ void BinaryTree::print_3(Node* root)
                     q.push(nullptr);
                     q.push(nullptr);
                 }
-                printSpaces(width); // Увеличиваем отступ между узлами
+                printSpaces(width);
 
             }
                 std::cout << std::endl;

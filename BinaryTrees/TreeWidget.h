@@ -3,6 +3,8 @@
 #include <QWidget>
 
 #include "BinaryTree.h"
+#include <QPainter>
+#include <QApplication>
 
 class QGraphicsScene;
 
@@ -13,6 +15,8 @@ class TreeWidget;
 class TreeWidget : public QWidget
 {
     Q_OBJECT
+
+
 
 public:
     explicit TreeWidget(QWidget *parent = nullptr);
@@ -27,6 +31,7 @@ public slots:
 protected:
     void resizeEvent(QResizeEvent *event) override;
 
+
 private:
     QPointF _drawTree(BinaryTree::Node *root, int leftBorderPos, int rightBorderPos, int yPos);
     void _redrawTree();
@@ -37,4 +42,5 @@ private:
     int m_fontSize = 22;
     BinaryTree *m_tree = nullptr;
     QGraphicsScene *m_scene = nullptr;
+
 };

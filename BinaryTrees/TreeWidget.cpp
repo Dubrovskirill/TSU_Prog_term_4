@@ -6,7 +6,8 @@
 
 #include "TreeWidget.h"
 #include "ui_TreeWidget.h"
-
+#include <QPainter>
+#include <QApplication>
 TreeWidget::TreeWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::TreeWidget),
@@ -16,10 +17,18 @@ TreeWidget::TreeWidget(QWidget *parent) :
     ui->setupUi(this);
     ui->graphicsView->setScene(m_scene);
 
+
+    QPixmap background("D:/GitHub/forest.jpg");
+    m_scene->setBackgroundBrush(background);
+
     connect(ui->pushButtonAdd, &QPushButton::clicked, this, [this](){
         addKey(ui->spinBoxKey->value());
     });
+    connect(ui->pushButtonRemove, &QPushButton::clicked, this, [this]
+            {removeKey(ui->spinBoxKey->value());
+            });
 }
+
 
 TreeWidget::~TreeWidget()
 {
@@ -47,7 +56,7 @@ void TreeWidget::addKey(int key)
 
 void TreeWidget::removeKey(int key)
 {
-    //TODO: implement
+    m_tree->remove(key);
     _redrawTree();
 }
 

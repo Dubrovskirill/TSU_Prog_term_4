@@ -16,3 +16,17 @@ int main(int argc, char *argv[])
     }
     return app.exec();
 }
+
+//int main(int argc, char *argv[])
+//{
+//    BinaryTree tr;
+//    for (int i = 1; i < 10; ++i)
+//    {
+//        tr.add(i);
+//    }
+
+//    tr.print_3(tr.root());
+//    tr.remove(1);
+//    tr.print_3(tr.root());
+//    return 0;
+//}
