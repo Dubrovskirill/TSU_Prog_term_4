@@ -6,7 +6,7 @@
 #include <iostream>
 #include <windows.h>
 #include <queue>
-#include <iomanip>
+#include <cmath>
 #undef max
 #undef min
 
@@ -540,8 +540,7 @@ void BinaryTree::print_2(Node* root) const {
 void BinaryTree::printSpaces(int count) 
 {
     for (int i = 0; i < count; ++i) 
-        std::cout << " ";
-    
+        std::cout << " "; 
 }
 
 // Функция для вывода двоичного дерева
@@ -556,7 +555,7 @@ void BinaryTree::print_3(Node* root)
     int maxLevelWidth = pow(2, he) - 1;
 
         while (!q.empty() && level <= he) {
-            int width = maxLevelWidth / pow(2, level);
+        int width = maxLevelWidth / pow(2, level);
             int padding = width / 2;
             printSpaces(padding);
 
@@ -579,8 +578,7 @@ void BinaryTree::print_3(Node* root)
                 std::cout << std::endl;
 
                 levelNodes *= 2;
-                ++level;
-            
+                ++level; 
         }
 }       
 

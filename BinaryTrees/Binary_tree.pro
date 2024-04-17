@@ -10,14 +10,19 @@ CONFIG += c++17
 
 SOURCES += \
     BinaryTreeTester.cpp \
+    TreeNodeGraphicsItem.cpp \
+    TreeWidget.cpp \
     main.cpp \
     binarytree.cpp
 
 HEADERS += \
     BinaryTreeTester.h \
+    TreeNodeGraphicsItem.h \
+    TreeWidget.h \
     binarytree.h
 
 FORMS += \
+    TreeWidget.ui \
     binarytree.ui
 
 # Default rules for deployment.
