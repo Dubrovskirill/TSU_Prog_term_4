@@ -7,12 +7,12 @@ int main()
 {
 
    BinaryTree tr;
-    for (int i = 1; i < 30; ++i)
+    for (int i = 1; i < 10; ++i)
     {
         tr.add(i);
     }
 
-    tr.print_2(tr.root());
+    tr.print_3(tr.root());
     std::cout << "\n" << "-------------------------" << "\n";
     tr.printHorizontal();
     tr.remove(1);

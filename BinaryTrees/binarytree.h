@@ -39,8 +39,8 @@ public:
    Node* root() const;
    Node* find(const int key) const;
    Node* parent(const Node* child) const;
-   virtual Node* find(Node* root, const int key) const;
-   virtual Node* add(const int key);
+   Node* find(Node* root, const int key) const;
+   Node* add(const int key);
    bool remove(const int key);
 
    void printHorizontal(Node* root, int marginLeft, int levelSpacing) const;
@@ -73,11 +73,12 @@ private:
 
 protected:
    virtual BinaryTree::Node* _addNode(Node* root, const int key);
+   Node* _copy(Node* root) const;
+   Node* m_root = nullptr;
 private:
    std::vector<BinaryTree::Node*> _leafs(Node* root) const;
-   Node* _copy(Node* root) const;
    Node* _copy() const;
-   Node* m_root = nullptr;
+
 
 };
 
