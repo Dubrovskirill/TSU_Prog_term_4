@@ -58,3 +58,39 @@ int SearchTree::max() const {
     }
     return current->getKey();
 }
+
+int SearchTree::level(const int key) const {
+    return level(root(), key, 0);
+}
+
+int SearchTree::level(Node* root, const int key, int currentLevel) const {
+    if (root == nullptr)
+        return -1;
+
+
+    if (root->getKey() == key)
+        return currentLevel;
+
+    int leftLevel = level(root->getLeft(), key, currentLevel + 1);
+
+    if (leftLevel != -1)
+        return leftLevel;
+
+    return level(root->getRight(), key, currentLevel + 1);
+}
+
+
+std::vector<int> SearchTree::keysVector() const {
+    std::vector<int> keys;
+    keysVector(m_root, keys);
+    return keys;
+}
+
+std::vector<int> SearchTree::keysVector(Node* root, std::vector<int>& keys)const {
+    if (!root)
+        return keys;
+    keysVector(root->getLeft(), keys);
+    keys.push_back(root->getKey());
+    keysVector(root->getRight(), keys);
+}
+

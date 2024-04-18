@@ -18,7 +18,12 @@ public:
 
     int min() const;
     int max() const;
+    int level(const int key) const;
+    int level(Node* root, const int key, int currentLevel) const;
 
+    std::vector<int> keysVector() const;
+    std::vector<int> keysVector(Node* root, std::vector<int>& keys)const;
+    SearchTree& operator=(const SearchTree& other);
 
 };
 
