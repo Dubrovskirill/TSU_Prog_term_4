@@ -1,6 +1,6 @@
 #include "SearchTree.h"
 #include "../../BinaryTrees/binarytree.h"
-
+#include <cassert>
 
 
 BinaryTree::Node* SearchTree::_addNode(Node* root, const int key)  {
@@ -42,8 +42,7 @@ BinaryTree::Node* SearchTree::find(Node* root, const int key) const {
 }
 
 int SearchTree::min() const {
-    if (isEmpty())
-        return INT_MIN;
+    assert(isEmpty());
 
     Node* current = root();
     while (current->getLeft() != nullptr) {
@@ -52,9 +51,8 @@ int SearchTree::min() const {
     return current->getKey();
 }
 
-int SearchTree::max() const {
-    if (isEmpty())
-        return INT_MIN;
+int SearchTree::max() const { 
+    assert(isEmpty());
 
     Node* current = root();
     while (current->getRight() != nullptr) {

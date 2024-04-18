@@ -380,3 +380,30 @@ void BinaryTreeTester::height_longRandomZigzagSubtrees()
         check_height(longTree, i + 1);
     }
 }
+
+std::vector<int> BinaryTreeTester::generateKeys()
+{
+    std::vector<int> orderedKeys;
+    for (int i = 0; i < m_maxSize; ++i) {
+        orderedKeys.push_back(i);
+    }
+
+    std::vector<int> keys;
+    while (!orderedKeys.empty()) {
+        int i = rand() % orderedKeys.size();
+        keys.push_back(orderedKeys[i]);
+        orderedKeys.erase(orderedKeys.begin() + i);
+    }
+
+    return keys;
+}
+
+bool BinaryTreeTester::useConsoleOutput() const
+{
+    return m_useConsoleOutput;
+}
+
+void BinaryTreeTester::setUseConsoleOutput(const bool enabled)
+{
+    m_useConsoleOutput = enabled;
+}

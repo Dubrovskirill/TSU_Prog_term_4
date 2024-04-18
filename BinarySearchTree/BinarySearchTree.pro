@@ -9,6 +9,7 @@ CONFIG += c++17 cmdline
 SOURCES += \
         ../BinaryTrees/binarytree.cpp \
         SearchTree.cpp \
+        SearchTreeTester.cpp \
         main.cpp
 
 # Default rules for deployment.
@@ -18,4 +19,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     ../BinaryTrees/binarytree.h \
-    SearchTree.h
+    SearchTree.h \
+    SearchTreeTester.h

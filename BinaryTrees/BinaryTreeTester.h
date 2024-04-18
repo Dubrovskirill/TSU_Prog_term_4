@@ -10,6 +10,7 @@ public:
 
     void test(const int size);
 
+    bool useConsoleOutput() const;
     bool addAndCountCheckEnabled() const;
     bool destructorCheckEnabled() const;
     bool removeCheckEnabled() const;
@@ -17,6 +18,7 @@ public:
     bool assignCheckEnabled() const;
     bool heightCheckEnabled() const;
 
+    void setUseConsoleOutput(const bool enabled);
     void setAddAndCountCheckEnabled(const bool enabled);
     void setDestructorCheckEnabled(const bool enabled);
     void setRemoveCheckEnabled(const bool enabled);
@@ -39,13 +41,17 @@ protected:
         const BinaryTree* second);
     virtual void check_height(const BinaryTree& tree, const int size);
 
+protected:
+    virtual void assign();
+    std::vector<int> generateKeys();
+    int m_maxSize;
+
 private:
     void deallocateTree(BinaryTree* tree);
     void addAndCount();
     void destructor();
     void remove();
-    void clear(); //ToDo: реализовать
-    void assign();
+    void clear();
     void height();
     void height_trivialCases();
     void height_longOnlyLeftSubtree();
@@ -55,7 +61,7 @@ private:
     TreeNodes treeNodes(const BinaryTree* tree);
 
 private:
-    int m_maxSize;
+
     bool m_useConsoleOutput;
     bool m_addAndCountCheckEnabled;
     bool m_destructorCheckEnabled;
