@@ -22,13 +22,13 @@ public:
    void clear();
 
    int size() const;
-   int min() const;
-   int max() const;
+   virtual int min() const;
+   virtual int max() const;
    int height() const;
    int height(Node* root) const;
    int nodeCount() const;
    int level(const int key) const;
-   int level(Node* root, const int key, int currentLevel) const;
+   virtual int level(Node* root, const int key, int currentLevel) const;
 
    BinaryTree copy(Node *root) const;
    BinaryTree copy() const;
@@ -39,7 +39,7 @@ public:
    Node* root() const;
    Node* find(const int key) const;
    Node* parent(const Node* child) const;
-   Node* find(Node* root, const int key) const;
+   virtual Node* find(Node* root, const int key) const;
    Node* add(const int key);
    bool remove(const int key);
 

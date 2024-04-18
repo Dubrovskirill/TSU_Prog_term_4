@@ -6,25 +6,37 @@ class SearchTree: public BinaryTree
 {
 public:
     SearchTree() = default;
+    SearchTree(const SearchTree& other)
+        : BinaryTree(other) {}
     ~SearchTree() = default;
 
-    Node* add(Node* root, const int value);
 
-    SearchTree copy(Node* root) const;
+
     SearchTree copy() const;
+    SearchTree copy(Node* root) const;
 
     Node* find(const int key) const;
-    Node* find(Node* root, const int key) const;
+    Node* find(Node* root, const int key) const override;
 
-    int min() const;
-    int max() const;
+    int min() const override;
+    int max() const override;
     int level(const int key) const;
-    int level(Node* root, const int key, int currentLevel) const;
+    int level(Node* root, const int key, int currentLevel) const override;
 
     std::vector<int> keysVector() const;
     std::vector<int> keysVector(Node* root, std::vector<int>& keys)const;
-    SearchTree& operator=(const SearchTree& other);
 
+
+    bool remove(const int key);
+protected:
+    Node* _addNode(Node* root, const int key) override;
+private:
+    bool isLeafOrRoot(Node* node) const;
+    bool hasOneChild(Node* node) const;
+    void handleLeafOrRootRemoval(Node* node);
+    void handleOneChildRemoval(Node* node);
+    void handleTwoChildrenRemoval(Node* node);
+    Node* findReplacementNode(Node* root) const;
 };
 
 #endif // SEARCHTREE_H
