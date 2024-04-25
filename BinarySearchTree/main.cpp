@@ -10,19 +10,20 @@
 #include "TreeWidget.h"
 int main(int argc, char *argv[])
 {
-//    QApplication app(argc, argv);
-//    TreeWidget widget;
-//    widget.show();
-//    for (int i = 0; i < 20; ++i) {
-//        widget.addKey(rand() % 100);
-//    }
-//    return app.exec();
 
-//        srand(time(0));
-//        SearchTreeTester tester(false);
-//        tester.test(1000);
+    QApplication app(argc, argv);
+    TreeWidget widget;
+    widget.show();
+    for (int i = 0; i < 20; ++i) {
+        widget.addKey(rand() % 100);
+    }
+    return app.exec();
 
-//        return 0;
+        srand(time(0));
+        SearchTreeTester tester(false);
+        tester.test(300);
+
+        return 0;
 
     SearchTree tr;
     int arr[8] = { 65, 71, 81, 32, 62, 57, 69, 45 };

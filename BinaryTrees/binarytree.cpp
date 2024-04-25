@@ -585,7 +585,7 @@ void BinaryTree::print_3(Node* root)
         }
 }
 
-std::vector<int> BinaryTree::bypassLRR()const
+std::vector<int> BinaryTree::bypassLnr()const
 {
         std::vector<int> keys;
         _bypassLRR(m_root, keys);

@@ -27,13 +27,25 @@
     <ClCompile Include="..\..\BinaryTrees\BinaryTreeTester.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\BinarySearchTree\SearchTree.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\BinarySearchTree\SearchTreeTester.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\BinaryTrees\binarytree.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\BinaryTrees\BinaryTreeTester.h">
+    <ClInclude Include="..\..\BinarySearchTree\SearchTree.h">
       <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\BinarySearchTree\SearchTreeTester.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\BinaryTrees\BinaryTreeTester.h">
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

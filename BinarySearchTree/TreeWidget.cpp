@@ -55,7 +55,8 @@ void TreeWidget::removeKey(int key)
 
 void TreeWidget::changeTree(int index)
 {
-    std::vector<int> treeVec = m_tree->bypassLRR();
+    std::vector<int> treeVec = m_tree->bypassLnr();
+
     delete m_tree;
     if(index == 0)
     {
@@ -75,8 +76,7 @@ void TreeWidget::changeTree(int index)
 
 void TreeWidget::findKey(int key)
 {
-    BinaryTree::Node* targetNode = m_tree->find(key);
-    _redrawTree(targetNode);
+    _redrawTree(m_tree->find(key));
 }
 
 QPointF TreeWidget::_drawTree(BinaryTree::Node *root, int leftBorderPos, int rightBorderPos, int yPos, BinaryTree::Node* targetNode)
