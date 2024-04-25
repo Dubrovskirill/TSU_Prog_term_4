@@ -1,7 +1,7 @@
 #ifndef SEARCHTREE_H
 #define SEARCHTREE_H
 
-#include "../../BinaryTrees/binarytree.h"
+#include "../BinaryTrees/binarytree.h"
 class SearchTree: public BinaryTree
 {
 public:
@@ -27,16 +27,20 @@ public:
     std::vector<int> keysVector(Node* root, std::vector<int>& keys)const;
 
 
-    bool remove(const int key);
+
+    bool remove(const int key) override;
+
+
 protected:
     Node* _addNode(Node* root, const int key) override;
+
 private:
-    bool isLeafOrRoot(Node* node) const;
-    bool hasOneChild(Node* node) const;
-    void handleLeafOrRootRemoval(Node* node);
-    void handleOneChildRemoval(Node* node);
-    void handleTwoChildrenRemoval(Node* node);
-    Node* findReplacementNode(Node* root) const;
+    bool removeRootNode(Node* node);
+    bool removeLeafNode(Node* node);
+    bool removeNodeWithOneChild(Node* node);
+    bool removeNodeWithTwoChildren(Node* node);
+    BinaryTree::Node* findReplacement(Node* root) const;
+
 };
 
 #endif // SEARCHTREE_H

@@ -41,11 +41,11 @@ public:
    Node* parent(const Node* child) const;
    virtual Node* find(Node* root, const int key) const;
    Node* add(const int key);
-   bool remove(const int key);
+   virtual bool remove(const int key);
 
    void printHorizontal(Node* root, int marginLeft, int levelSpacing) const;
    void printHorizontal() const;
-   void print(Node* root, int leftBorderPos = 10, int rightBorderPo = 100, int yPos = 10) const;
+   void print(Node* root, int leftBorderPos = 10, int rightBorderPos = 100, int yPos = 0) const;
    void print() const;
    void moveCursor(int xPos, int yPos) const;
    void printLeafs() const;
@@ -64,7 +64,7 @@ public:
    void print_3(Node* root);
 
 
-   
+   std::vector<int> bypassLRR()const;
 private:
     bool removeRootNode(Node* node);
     bool removeLeafNode(Node* node);
@@ -74,6 +74,7 @@ private:
 protected:
    virtual BinaryTree::Node* _addNode(Node* root, const int key);
    Node* _copy(Node* root) const;
+   void _bypassLRR(Node* root, std::vector<int>& keys)const;
    Node* m_root = nullptr;
 private:
    std::vector<BinaryTree::Node*> _leafs(Node* root) const;

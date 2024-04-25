@@ -1,5 +1,6 @@
-QT = core
+QT       += core gui
 
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 CONFIG += c++17 cmdline
 
 # You can make your code fail to compile if it uses deprecated APIs.
@@ -7,9 +8,12 @@ CONFIG += c++17 cmdline
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+        ../BinaryTrees/BinaryTreeTester.cpp \
         ../BinaryTrees/binarytree.cpp \
+        GraphicsNode.cpp \
         SearchTree.cpp \
         SearchTreeTester.cpp \
+        TreeWidget.cpp \
         main.cpp
 
 # Default rules for deployment.
@@ -18,6 +22,14 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+    ../BinaryTrees/BinaryTreeTester.h \
     ../BinaryTrees/binarytree.h \
+    GraphicsItemNode.h \
+    GraphicsNode.h \
     SearchTree.h \
-    SearchTreeTester.h
+    SearchTreeTester.h \
+    TreeWidget.h
+
+
+FORMS += \
+    TreeWidget.ui

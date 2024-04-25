@@ -71,16 +71,19 @@ void BinaryTree::clear()
     delete m_root;
     m_root = nullptr;
 }
+
 void BinaryTree::nodeList(std::list<Node*>& nodeList) const
 {
     Node* current = nullptr;
     std::list<Node*> tmp;
     tmp = nodeList;
+
     while (!tmp.empty())
     {
-        if(tmp.front())
+        if(tmp.front()!=nullptr)
         {
             current = tmp.front();
+            
             if(current->getLeft()){
                 nodeList.push_back(current->getLeft());
                 tmp.push_back(current->getLeft());
@@ -218,7 +221,7 @@ std::vector<int> BinaryTree::keysVector()const //keysVector
     if (!m_root)
         return vec;
     nodeL.push_back(m_root);
-    nodeList(nodeL); //NodeList
+    nodeList(nodeL);
     while (!nodeL.empty())
     {
         vec.push_back(nodeL.front()->getKey());
@@ -499,8 +502,8 @@ void BinaryTree::print(Node* root, int leftBorderPos, int rightBorderPos, int yP
     moveCursor(xPos, yPos);
     std::cout << root->getKey() << std::endl;
 
-    print(root->getLeft(), leftBorderPos, xPos, yPos + 15);
-    print(root->getRight(), xPos, rightBorderPos, yPos + 15);
+    print(root->getLeft(), leftBorderPos, xPos, yPos + 2);
+    print(root->getRight(), xPos, rightBorderPos, yPos + 2);
 }
 //не работает
 void BinaryTree::moveCursor(int xPos, int yPos) const
@@ -540,7 +543,7 @@ void BinaryTree::print_2(Node* root) const {
 void BinaryTree::printSpaces(int count) 
 {
     for (int i = 0; i < count; ++i) 
-        std::cout << " "; 
+        std::cout << "  "; 
 }
 
 
@@ -563,12 +566,12 @@ void BinaryTree::print_3(Node* root)
                 Node* current = q.front();
                 q.pop();
                 if (current != nullptr) {
-                    std::cout << current->getKey();
+                    std::cout << (current->getKey() < 10 ? "0" : "") << current->getKey();
                     q.push(current->getLeft());
                     q.push(current->getRight());
                 }
                 else {
-                    std::cout << " ";
+                    std::cout << "xx";
                     q.push(nullptr);
                     q.push(nullptr);
                 }
@@ -580,5 +583,20 @@ void BinaryTree::print_3(Node* root)
                 levelNodes *= 2;
                 ++level; 
         }
-}       
+}
 
+std::vector<int> BinaryTree::bypassLRR()const
+{
+        std::vector<int> keys;
+        _bypassLRR(m_root, keys);
+        return keys;
+}
+
+void BinaryTree::_bypassLRR(Node* root, std::vector<int>& keys)const
+{
+        if (!root)
+                return;
+        _bypassLRR(root->getLeft(), keys);
+        keys.push_back(root->getKey());
+        _bypassLRR(root->getRight(), keys);
+}

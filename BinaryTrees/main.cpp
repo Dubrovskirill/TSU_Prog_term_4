@@ -4,10 +4,16 @@
 #include <QDebug>
 #include <iostream>
 #include "TreeWidget.h"
+#include"BinaryTreeTester.h"
 
 
 int main(int argc, char *argv[])
 {
+    srand(time(0));
+    BinaryTreeTester tester(false);
+    tester.test(1000);
+    return 0;
+
     QApplication app(argc, argv);
     TreeWidget widget;
     widget.show();

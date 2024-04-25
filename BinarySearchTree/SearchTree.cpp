@@ -1,5 +1,5 @@
 #include "SearchTree.h"
-#include "../../BinaryTrees/binarytree.h"
+#include "../BinaryTrees/BinaryTreeTester.h"
 #include <cassert>
 
 
@@ -98,99 +98,107 @@ std::vector<int> SearchTree::keysVector(Node* root, std::vector<int>& keys)const
 
 
 bool SearchTree::remove(const int key) {
-    Node* removableNode = BinaryTree::find(key);
-    if (!removableNode)
+    Node* node = find(key);
+    if (!node)
         return false;
+    if (!node->getLeft() && !node->getRight())
+        return removeLeafNode(node);
+    else if (!node->getLeft() || !node->getRight())
+        return removeNodeWithOneChild(node);
+    else
+        return removeNodeWithTwoChildren(node);
 
-    if (isLeafOrRoot(removableNode)) {
-        handleLeafOrRootRemoval(removableNode);
-    } else if (hasOneChild(removableNode)) {
-        handleOneChildRemoval(removableNode);
+    return false;
+}
+
+
+bool SearchTree::removeLeafNode(Node* node) {
+    Node* parentNode = parent(node);
+    if (node == m_root)
+    {
+        delete m_root;
+        m_root = nullptr;
+        return true;
+    }
+    if (node->getKey() < parentNode->getKey())
+        parentNode->setLeft(nullptr);
+    else
+        parentNode->setRight(nullptr);
+    delete node;
+    return true;
+}
+
+bool SearchTree::removeNodeWithOneChild(Node* node) {
+    Node* parentNode = parent(node);
+    Node* child = (node->getLeft()) ? node->getLeft() : node->getRight();
+
+    if (node->getKey() < parentNode->getKey()) {
+        if(parentNode != node) {
+            parentNode->setLeft(child);
+        } else {
+            m_root = child;
+        }
     } else {
-        handleTwoChildrenRemoval(removableNode);
+        if(parentNode != node) {
+            parentNode->setRight(child);
+        } else {
+            m_root = child;
+        }
+    }
+    delete node;
+    return true;
+}
+
+bool SearchTree::removeNodeWithTwoChildren(Node* node) {
+
+    Node* parentNode = parent(node);
+    Node* replacementNode = findReplacement(node);
+    Node* parentReplacementNode = parent(replacementNode);
+    replacementNode->setRight(node->getRight());
+
+    if (!replacementNode->getLeft()) {
+
+        if (parentReplacementNode != node) {
+            replacementNode->setLeft(node->getLeft());
+            parentReplacementNode->setRight(nullptr);
+        }
+        if (parentNode){
+            if (parentNode->getLeft() == node)
+                parentNode->setLeft(replacementNode);
+            else
+                parentNode->setRight(replacementNode);
+        }
+    }
+    else{
+        replacementNode->setRight(node->getRight());
+        if (parentNode)
+        {
+            if (parentNode->getLeft() == node)
+                parentNode->setLeft(replacementNode);
+            else
+                parentNode->setRight(replacementNode);
+        }
+        if (parentReplacementNode != node)
+        {
+            parentReplacementNode->setRight(replacementNode->getLeft());
+            replacementNode->setLeft(node->getLeft());
+        }
+    }
+
+    if (parentNode == node) {
+        m_root = replacementNode;
     }
 
     return true;
 }
 
-bool SearchTree::isLeafOrRoot(Node* node) const {
-    return !node->getLeft() && !node->getRight();
-}
-
-bool SearchTree::hasOneChild(Node* node) const {
-    return (node->getLeft() && !node->getRight()) || (!node->getLeft() && node->getRight());
-}
-
-void SearchTree::handleLeafOrRootRemoval(Node* node) {
-    if (node == m_root) {
-        delete m_root;
-        m_root = nullptr;
-    } else {
-        Node* parentNode = parent(node);
-        if (node->getKey() < parentNode->getKey()) {
-            parentNode->setLeft(nullptr);
-        } else {
-            parentNode->setRight(nullptr);
-        }
-        delete node;
-    }
-}
-
-void SearchTree::handleOneChildRemoval(Node* node) {
-    Node* replacementNode = node->getLeft() ? node->getLeft() : node->getRight();
-    Node* parentNode = parent(node);
-    if (parentNode) {
-        if (node->getKey() < parentNode->getKey())
-            parentNode->setLeft(replacementNode);
-        else
-            parentNode->setRight(replacementNode);
-    } else {
-        m_root = replacementNode;
-    }
-    delete node;
-}
-
-void SearchTree::handleTwoChildrenRemoval(Node* node) {
-    Node* parentNode = parent(node);
-    Node* replacementNode = findReplacementNode(node);
-    Node* parentReplacementNode = parent(replacementNode);
-
-    if (!replacementNode->getLeft()) {
-        replacementNode->setRight(node->getRight());
-        if (parentNode) {
-            if (parentNode->getLeft() == node)
-                parentNode->setLeft(replacementNode);
-            else
-                parentNode->setRight(replacementNode);
-        }
-        if (parentReplacementNode != node) {
-            replacementNode->setLeft(node->getLeft());
-            parentReplacementNode->setRight(nullptr);
-        }
-    } else {
-        replacementNode->setRight(node->getRight());
-        if (parentNode) {
-            if (parentNode->getLeft() == node)
-                parentNode->setLeft(replacementNode);
-            else
-                parentNode->setRight(replacementNode);
-        }
-        if (parentReplacementNode != node) {
-            parentReplacementNode->setRight(replacementNode->getLeft());
-            replacementNode->setLeft(node->getLeft());
-        }
-    }
-    if (node == m_root)
-        m_root = replacementNode;
-    delete node;
-}
-
-BinaryTree::Node* SearchTree::findReplacementNode(Node* root) const {
+BinaryTree::Node* SearchTree::findReplacement(Node* root) const {
     Node* tmpRoot = root->getLeft();
-    while (tmpRoot) {
-        if (tmpRoot && !tmpRoot->getRight())
-            return tmpRoot;
+    while (tmpRoot && tmpRoot->getRight())
         tmpRoot = tmpRoot->getRight();
-    }
-    return nullptr;
+    return tmpRoot;
 }
+
+
+
+

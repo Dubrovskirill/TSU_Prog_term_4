@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../BinaryTrees/BinaryTreeTester.h"
+#include"..\BinaryTrees\BinaryTreeTester.h"
 
 
 class SearchTreeTester : public BinaryTreeTester
