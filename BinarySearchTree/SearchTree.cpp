@@ -150,27 +150,24 @@ bool SearchTree::removeNodeWithOneChild(Node* node) {
 }
 
 bool SearchTree::removeNodeWithTwoChildren(Node* node) {
+    if (!node) {
+        return true;
+    }
 
-    Node* parentNode = parent(node);
     Node* replacementNode = findReplacement(node);
     Node* parentReplacementNode = parent(replacementNode);
     replacementNode->setRight(node->getRight());
 
-    if (!replacementNode->getLeft()) {
-
-        if (parentReplacementNode != node) {
-            replacementNode->setLeft(node->getLeft());
-            parentReplacementNode->setRight(nullptr);
-        }
-        if (parentNode){
-            if (parentNode->getLeft() == node)
-                parentNode->setLeft(replacementNode);
-            else
-                parentNode->setRight(replacementNode);
-        }
+    if (parentReplacementNode != node)
+    {
+        parentReplacementNode->setRight(replacementNode->getLeft());
+        replacementNode->setLeft(node->getLeft());
     }
-    else{
-        replacementNode->setRight(node->getRight());
+
+    if (m_root == node) {
+        m_root = replacementNode;
+    } else {
+        Node* parentNode = parent(node);
         if (parentNode)
         {
             if (parentNode->getLeft() == node)
@@ -178,15 +175,6 @@ bool SearchTree::removeNodeWithTwoChildren(Node* node) {
             else
                 parentNode->setRight(replacementNode);
         }
-        if (parentReplacementNode != node)
-        {
-            parentReplacementNode->setRight(replacementNode->getLeft());
-            replacementNode->setLeft(node->getLeft());
-        }
-    }
-
-    if (parentNode == node) {
-        m_root = replacementNode;
     }
 
     return true;

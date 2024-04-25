@@ -62,9 +62,9 @@ public:
   
    void printSpaces(int count);
    void print_3(Node* root);
-
-
-   std::vector<int> bypassLRR()const;
+   
+   
+   std::vector<int> bypassLnr()const;
 private:
     bool removeRootNode(Node* node);
     bool removeLeafNode(Node* node);
