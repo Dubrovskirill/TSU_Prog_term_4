@@ -149,3 +149,16 @@ BinaryTree::Node* AvlTree::turnDoubleLR(Node* middle, Node* top) {
 
     return extra;
 }
+
+AvlTree AvlTree::copy() const
+{
+    return copy(m_root);
+}
+
+AvlTree AvlTree::copy(Node* root) const
+{
+    BinaryTree temp = BinaryTree::copy(root);
+    AvlTree tr;
+    tr.m_root = _copy(temp.root());
+    return tr;
+}

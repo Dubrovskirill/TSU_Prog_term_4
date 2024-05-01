@@ -5,6 +5,10 @@ class AvlTree : public SearchTree
 public:
     AvlTree() = default;
     ~AvlTree() = default;
+
+    AvlTree copy() const;
+    AvlTree copy(Node* root) const;
+    AvlTree& operator = (const AvlTree& other) = default;
     
 protected:
     Node* _addNode(Node* root, const int key) override;

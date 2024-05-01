@@ -26,7 +26,7 @@ public:
     std::vector<int> keysVector() const;
     std::vector<int> keysVector(Node* root, std::vector<int>& keys)const;
 
-
+    SearchTree& operator = (const SearchTree& other) = default;
 
     bool remove(const int key) override;
 
