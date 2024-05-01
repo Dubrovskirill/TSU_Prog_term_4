@@ -33,13 +33,13 @@ public:
 
 protected:
     Node* _addNode(Node* root, const int key) override;
-
+    BinaryTree::Node* findReplacement(Node* root) const;
 private:
     bool removeRootNode(Node* node);
     bool removeLeafNode(Node* node);
     bool removeNodeWithOneChild(Node* node);
     bool removeNodeWithTwoChildren(Node* node);
-    BinaryTree::Node* findReplacement(Node* root) const;
+   
 
 };
 

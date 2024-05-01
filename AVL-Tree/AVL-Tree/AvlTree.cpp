@@ -8,25 +8,25 @@ BinaryTree::Node* AvlTree::_addNode(Node* root, const int key){
     else if (key < root->getKey()) {
         root->setLeft(_addNode(root->getLeft(), key));
         if (!isFixed) {
-            balance(root, root->getLeft());
+            balanceAfterAdd(root, root->getLeft());
         }
     }
     else if (key > root->getKey()) {
         root->setRight(_addNode(root->getRight(), key));
         if (!isFixed) {
-            balance(root, root->getRight());
+            balanceAfterAdd(root, root->getRight());
         }
     }
 
     return root;
 }
 
-int AvlTree::bFactor(Node* node) {
+int AvlTree::bFactor(Node* node) const {
 
     return height(node->getRight()) - height(node->getLeft());
 }
 
-void AvlTree::balance(Node*& root, Node* nodeChild) {
+void AvlTree::balanceAfterAdd(Node*& root, Node* nodeChild) {
 
     if (nodeChild == root) {
         return;
@@ -162,3 +162,103 @@ AvlTree AvlTree::copy(Node* root) const
     tr.m_root = _copy(temp.root());
     return tr;
 }
+
+bool AvlTree::remove(const int key) {
+    
+    Node* node = find(key);
+    if (!node)
+        return false;
+
+    if (size() == 1) {
+        delete node;
+        m_root = nullptr;
+        return true;
+    }
+
+    Node* root=m_root, *replacement;
+    
+    std::list < BinaryTree::Node*> route;
+    if (node->getRight() && node->getLeft()) {
+        replacement = findReplacement(node);
+        root = parent(replacement);
+        if (node == root) {
+            root = replacement;
+        }
+    }
+    else {
+        root = parent(node);
+        if (root == node) {
+            root = (root->getLeft() ? root->getLeft() : root->getRight());
+        }
+    }
+    if (SearchTree::remove(key)) {
+        isFixed = false;
+        formRoute(route, m_root, root);
+    }
+
+    return isFixed==false 
+        ? avlRemove(route)
+        :isFixed;
+    
+}
+
+void AvlTree::formRoute(std::list < BinaryTree::Node*>& route, Node* from, Node* to)
+{ 
+    route.push_back(from);
+    if (from->getKey() > to->getKey())
+        formRoute(route, from->getLeft(), to);
+    else  if (from->getKey() < to->getKey())
+        formRoute(route, from->getRight(), to);
+    return;
+}
+
+bool AvlTree::avlRemove(std::list < BinaryTree::Node*>& route)
+{
+   balanceAfterRemove(*(--route.end()));
+   route.pop_back();
+   if (!isFixed && !route.empty())
+       avlRemove(route);
+   return isFixed;
+}
+
+
+void AvlTree::balanceAfterRemove(Node*& root) {
+    
+
+    Node* p = parent(root);
+    if (p == root)
+        p = nullptr;
+    
+    switch (bFactor(root)) {
+    case 1:
+        isFixed = true;
+        break;
+
+    case -1:
+        isFixed = true;
+        break;
+
+    case -2:
+        if (bFactor(root->getLeft()) < 1) {
+            root = turnRight(root, p);
+        }
+        else {
+            root = turnDoubleLR(root, p);
+        }
+        break;
+
+    case 2:
+        if (bFactor(root->getRight()) > -1) {
+            root = turnLeft(root, p);
+        }
+        else {
+            root = turnDoubleRL(root, p);
+        }
+        break;
+    }
+}
+
+
+
+
+

@@ -62,6 +62,7 @@ public:
   
    void printSpaces(int count);
    void print_3(Node* root);
+   void print_Dima_2(Node* root) const;
    
    
    std::vector<int> bypassLnr()const;
