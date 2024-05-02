@@ -101,12 +101,16 @@ public:
     void setLeft(Node* left);
     void setRight(Node* right);
 
+    int getBalance() const { return m_balance; }
+    void setBalance(int newB) { m_balance = newB; }
 
 private:
+   
     int m_key = 0;
     Node* m_left = nullptr;
     Node* m_right = nullptr;
 
+    int m_balance = 0;
 };
 
 

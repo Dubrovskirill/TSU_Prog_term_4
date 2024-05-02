@@ -81,7 +81,7 @@ bool SearchTreeTester::isSearchTree(const BinaryTree* tree)
     return std::is_sorted(keys.begin(), keys.end());
 }
 
-void SearchTreeTester::treeKeysLnr(BinaryTree::Node* root, std::vector<int>& keys)//bug?
+void SearchTreeTester::treeKeysLnr(BinaryTree::Node* root, std::vector<int>& keys)
 {
     if (!root) {
         return;

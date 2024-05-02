@@ -7,14 +7,18 @@ BinaryTree::Node* AvlTree::_addNode(Node* root, const int key){
     }
     else if (key < root->getKey()) {
         root->setLeft(_addNode(root->getLeft(), key));
+        
         if (!isFixed) {
-            balanceAfterAdd(root, root->getLeft());
+            root->setBalance(root->getBalance() - 1);
+            balanceAfterAdd(root);
         }
     }
     else if (key > root->getKey()) {
         root->setRight(_addNode(root->getRight(), key));
+        
         if (!isFixed) {
-            balanceAfterAdd(root, root->getRight());
+            root->setBalance(root->getBalance() + 1);
+            balanceAfterAdd(root);
         }
     }
 
@@ -26,23 +30,19 @@ int AvlTree::bFactor(Node* node) const {
     return height(node->getRight()) - height(node->getLeft());
 }
 
-void AvlTree::balanceAfterAdd(Node*& root, Node* nodeChild) {
-
-    if (nodeChild == root) {
-        return;
-    }
+void AvlTree::balanceAfterAdd(Node*& root) {
 
     Node* p = parent(root);
     if (p == root)
         p = nullptr;
 
-    switch (bFactor(root)) {
+    switch (root->getBalance()) {
     case 0:
         isFixed = true;
         break;
 
     case -2:
-        if (bFactor(nodeChild) < 1) {
+        if (root->getLeft()->getBalance() < 1) {
             root = turnRight(root, p);
         }
         else {
@@ -53,7 +53,7 @@ void AvlTree::balanceAfterAdd(Node*& root, Node* nodeChild) {
 
 
     case 2:
-        if (bFactor(nodeChild) > -1) {
+        if (root->getRight()->getBalance() > -1) {
             root = turnLeft(root, p);
         }
         else {
@@ -61,7 +61,13 @@ void AvlTree::balanceAfterAdd(Node*& root, Node* nodeChild) {
         }
         isFixed = true;
         break;
+
+
+    default:
+        break;
     }
+    
+
 }
 
 BinaryTree::Node* AvlTree::turnRight(Node* middle, Node* top) {
@@ -71,7 +77,6 @@ BinaryTree::Node* AvlTree::turnRight(Node* middle, Node* top) {
     
     Node* bottom = middle->getLeft();
 
-    
 
     middle->setLeft(bottom->getRight());
     bottom->setRight(middle);
@@ -82,6 +87,8 @@ BinaryTree::Node* AvlTree::turnRight(Node* middle, Node* top) {
     else
         top->setRight(bottom);
 
+   middle->setBalance(bFactor(middle));
+   bottom->setBalance(0);
     return bottom;
 }
 
@@ -102,6 +109,8 @@ BinaryTree::Node* AvlTree::turnLeft(Node* middle, Node* top) {
         top->setLeft(bottom);
     else
         top->setRight(bottom);
+    middle->setBalance(bFactor(middle));
+    bottom->setBalance(0);
     return bottom;
 }
 
@@ -110,44 +119,26 @@ BinaryTree::Node* AvlTree::turnDoubleRL(Node* middle, Node* top) {
         return{};
     
     Node* bottom = middle->getRight();
-    Node* extra = bottom->getLeft();
+    bottom = turnRight(bottom, middle);
+    bottom->setBalance(bottom->getBalance() + 1);
+    middle = turnLeft(middle, top);
+    return middle;
 
-    bottom->setLeft(extra->getRight());
-    extra->setRight(bottom);
-
-    middle->setRight(extra->getLeft());
-    extra->setLeft(middle);
-    if (!top) 
-        m_root=extra;
-    else if (top->getLeft() == middle)
-        top->setLeft(extra);
-    else
-        top->setRight(extra);
+  
     
-    return extra;
+   
 }
 
 BinaryTree::Node* AvlTree::turnDoubleLR(Node* middle, Node* top) {
 
     if (!middle || !middle->getLeft() || !middle->getLeft()->getRight())
         return{};
-
     Node* bottom = middle->getLeft();
-    Node* extra = bottom->getRight();
+    bottom = turnLeft(bottom, middle);
+    bottom->setBalance(bottom->getBalance()+1);
+    middle = turnRight(middle, top);
+    return middle;
 
-    bottom->setRight(extra->getLeft());
-    extra->setLeft(bottom);
-
-    middle->setLeft(extra->getRight());
-    extra->setRight(middle);
-    if (!top)
-        m_root = extra;
-    else if (top->getLeft() == middle)
-        top->setLeft(extra);
-    else
-        top->setRight(extra);
-
-    return extra;
 }
 
 AvlTree AvlTree::copy() const
@@ -255,6 +246,10 @@ void AvlTree::balanceAfterRemove(Node*& root) {
             root = turnDoubleRL(root, p);
         }
         break;
+
+    default:
+        break;
+
     }
 }
 

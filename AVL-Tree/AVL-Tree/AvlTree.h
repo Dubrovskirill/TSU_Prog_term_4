@@ -13,7 +13,7 @@ public:
 protected:
     Node* _addNode(Node* root, const int key) override;
     int bFactor(Node* node) const;
-    void balanceAfterAdd(Node*& root, Node* nodeSide);
+    void balanceAfterAdd(Node*& root);
     Node* turnRight(Node* middle, Node* top);
     Node* turnLeft(Node* middle, Node* top);
     Node* turnDoubleRL(Node* middle, Node* top);
