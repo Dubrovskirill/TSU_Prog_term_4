@@ -324,19 +324,35 @@ BinaryTree::Node* BinaryTree::parent(const Node* child) const
 
 bool BinaryTree::remove(const int key)
 {
+    return removeRecursive(m_root, key);
+}
 
-    Node* removableNode = find(key);
-    if (!removableNode)
+
+bool BinaryTree::removeRecursive(Node* root, const int key)
+{
+    if (!root)
         return false;
 
-    if (removableNode == m_root)
-        return removeRootNode(removableNode);
-    if (!removableNode->getLeft() && !removableNode->getRight())
-        return removeLeafNode(removableNode);
-    if (removableNode->getLeft() && removableNode->getRight())
-        return removeNodeWithTwoChildren(removableNode);
+    if (root->getKey() == key) {
+       
+        if (!root)
+            return false;
 
-    return removeNodeWithOneChild(removableNode);
+        if (root == m_root)
+            return removeRootNode(root);
+        if (!root->getLeft() && !root->getRight())
+            return removeLeafNode(root);
+        if (root->getLeft() && root->getRight())
+            return removeNodeWithTwoChildren(root);
+
+        return removeNodeWithOneChild(root);
+
+    }
+    if (!removeRecursive(root->getLeft(), key)) {
+
+        return  removeRecursive(root->getRight(), key);
+    }
+    
 }
 bool BinaryTree::removeRootNode(Node* node)
 {
@@ -355,7 +371,7 @@ bool BinaryTree::removeRootNode(Node* node)
     parentNode = parent(replacementNode);
     if (parentNode->getLeft() == replacementNode)
         parentNode->setLeft(nullptr);
-    else if(parentNode->getRight() == replacementNode)
+    else if (parentNode->getRight() == replacementNode)
         parentNode->setRight(nullptr);
     replacementNode->setLeft(node->m_left);
     replacementNode->setRight(node->m_right);
@@ -405,7 +421,7 @@ bool BinaryTree::removeNodeWithOneChild(Node* node)
     Node* replacementNode = nullptr;
     if (node->getLeft())
         replacementNode = node->getLeft();
-    else if(node->getRight())
+    else if (node->getRight())
         replacementNode = node->getRight();
     if (parentNode->getLeft() == node)
         parentNode->setLeft(replacementNode);

@@ -96,22 +96,6 @@ std::vector<int> SearchTree::keysVector(Node* root, std::vector<int>& keys)const
     keysVector(root->getRight(), keys);
 }
 
-
-bool SearchTree::remove(const int key) {
-    Node* node = find(key);
-    if (!node)
-        return false;
-    if (!node->getLeft() && !node->getRight())
-        return removeLeafNode(node);
-    else if (!node->getLeft() || !node->getRight())
-        return removeNodeWithOneChild(node);
-    else
-        return removeNodeWithTwoChildren(node);
-
-    return false;
-}
-
-
 bool SearchTree::removeLeafNode(Node* node) {
     Node* parentNode = parent(node);
     if (node == m_root)
@@ -188,5 +172,30 @@ BinaryTree::Node* SearchTree::findReplacement(Node* root) const {
 }
 
 
+bool SearchTree::removeRecursive(Node* root, const int key)
+{
+    if (!root)
+        return false;
 
+    if (root->getKey() == key) {
+
+        if (!root->getLeft() && !root->getRight()) {
+            return removeLeafNode(root);
+        }
+        else if (!root->getLeft() || !root->getRight()) {
+            return removeNodeWithOneChild(root);
+        }
+        else {
+            return removeNodeWithTwoChildren(root);
+        }
+
+    }
+    else if (root->getKey() > key) {
+        removeRecursive(root->getLeft(), key);
+    }
+    else { 
+        removeRecursive(root->getRight(), key);
+    }
+
+}
 

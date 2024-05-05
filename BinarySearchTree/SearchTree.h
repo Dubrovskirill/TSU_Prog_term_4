@@ -28,19 +28,17 @@ public:
 
     SearchTree& operator = (const SearchTree& other) = default;
 
-    bool remove(const int key) override;
+   // bool remove(const int key) override;
 
 
 protected:
     Node* _addNode(Node* root, const int key) override;
     BinaryTree::Node* findReplacement(Node* root) const;
-private:
-    bool removeRootNode(Node* node);
-    bool removeLeafNode(Node* node);
-    bool removeNodeWithOneChild(Node* node);
-    bool removeNodeWithTwoChildren(Node* node);
-   
 
+    bool removeRecursive(Node* root, const int key) override;
+    bool removeLeafNode(Node* node) override;
+    bool removeNodeWithOneChild(Node* node) override;
+    bool removeNodeWithTwoChildren(Node* node) override;
 };
 
 #endif // SEARCHTREE_H
