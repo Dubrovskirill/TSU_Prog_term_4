@@ -521,7 +521,7 @@ void BinaryTree::print(Node* root, int leftBorderPos, int rightBorderPos, int yP
     print(root->getLeft(), leftBorderPos, xPos, yPos + 2);
     print(root->getRight(), xPos, rightBorderPos, yPos + 2);
 }
-//не работает
+
 void BinaryTree::moveCursor(int xPos, int yPos) const
 {
     COORD coord;
@@ -556,14 +556,14 @@ void BinaryTree::print_2(Node* root) const {
 }
 
 
-void BinaryTree::printSpaces(int count) 
+void BinaryTree::printSpaces(int count) const
 {
     for (int i = 0; i < count; ++i) 
         std::cout << "  "; 
 }
 
 
-void BinaryTree::print_3(Node* root)
+void BinaryTree::print_3(Node* root) const
 {
     int he = height(root);
     std::queue<Node*> q;
@@ -617,68 +617,5 @@ void BinaryTree::_bypassLRR(Node* root, std::vector<int>& keys)const
         _bypassLRR(root->getRight(), keys);
 }
 
-void BinaryTree::print_Dima_2(Node* root) const {
-    if (!root) {
-        root = m_root;
-        if (!root) {
-            return;
-        }
-    }
 
-    auto setIndentation = [](const int count, const char symbol = ' ') {
-        for (int i = 0; i < count; ++i)
-            std::cout << symbol;
-    };
 
-    int height = this->height(root);
-    std::queue<Node*> unprocessedNodes;
-    unprocessedNodes.push(root);
-
-    int levelNodes = 1;
-    int level = 0;
-    int maxLevelWidth = pow(2, height) - 1;
-
-    while (!unprocessedNodes.empty() && level <= height) {
-        int width = maxLevelWidth / pow(2, level);
-        int padding = width / 2;
-        setIndentation(padding);
-
-        for (int i = 0; i < levelNodes; ++i) {
-            Node* current = unprocessedNodes.front();
-            unprocessedNodes.pop();
-            if (current) {
-                std::cout << "+";
-                setIndentation(padding, '-');
-
-                std::cout << current->getKey() << (current->getKey() < 10 ? '-' : '\0');
-
-                setIndentation(padding, '-');
-                std::cout << "+";
-
-                unprocessedNodes.push(current->getLeft());
-                unprocessedNodes.push(current->getRight());
-            }
-            else {
-                if (level >= height) {
-                    return;
-                }
-
-                std::cout << "┌";
-                setIndentation(padding, '-');
-                std::cout << "xx";
-                setIndentation(padding, '-');
-                std::cout << "┐";
-
-                unprocessedNodes.push(nullptr);
-                unprocessedNodes.push(nullptr);
-            }
-            setIndentation(width - 1);
-
-        }
-        std::cout << std::endl;
-
-        levelNodes *= 2;
-        ++level;
-    }
-
-}

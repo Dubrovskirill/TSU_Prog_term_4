@@ -1,5 +1,6 @@
 #pragma once
 #include<stack>
+
 #include"../../BinarySearchTree/SearchTree.h"
 class AvlTree : public SearchTree
 {
@@ -10,11 +11,12 @@ public:
     AvlTree copy() const;
     AvlTree copy(Node* root) const;
     AvlTree& operator = (const AvlTree& other) = default;
-
+    bool isFixed = true;
+     bool remove(const int key) override;
 protected:
     Node* _addNode(Node* root, const int key) override;
     int bFactor(Node* node) const;
-    void balance—orrection(Node*& root, bool flag=false);
+    void balance—orrection(Node*& root, bool addOrRem=false); // false - add,  true -  remove;
     Node* turnRight(Node* middle, Node* top);
     Node* turnLeft(Node* middle, Node* top);
     Node* turnDoubleRL(Node* middle, Node* top);
@@ -24,14 +26,11 @@ protected:
     bool removeNodeWithTwoChildren(Node* node) override;
     void route(Node* from, Node* to);
 
+
 private:
-    struct routeNode;
-    bool isFixed = true; 
+   
+    bool isRemove = true;
+    
 };
 
-struct AvlTree::routeNode
-{
-    Node * node= nullptr;
-    int balance = 0;
-};
 

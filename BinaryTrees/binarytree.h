@@ -59,13 +59,13 @@ public:
    
    void print_2(Node* root,int level, int xPos, int yPos, int xShift) const;
    void print_2(Node* root) const;
-   void printSpaces(int count);
-   void print_3(Node* root);
-   void print_Dima_2(Node* root) const;
+   void printSpaces(int count) const;
+   void print_3(Node* root) const;
+   
 
    std::vector<int> bypassLnr()const;
 
-    bool remove(const int key);
+   virtual bool remove(const int key);
 protected:
     
     virtual bool removeRecursive(Node* root, const int key);

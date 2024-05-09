@@ -73,8 +73,8 @@ void SearchTreeTester::assign()
 bool SearchTreeTester::isSearchTree(const BinaryTree* tree)
 {
     if (useConsoleOutput()) {
-        tree->printHorizontal();
-        std::cout << "======\n";
+        tree->print_3(tree->root());
+        std::cout << "=============================\n";
     }
     std::vector<int> keys;
     treeKeysLnr(tree->root(), keys);

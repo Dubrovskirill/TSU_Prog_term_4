@@ -18,6 +18,10 @@ BinaryTree* AvlTreeTester::allocateTree()
 void AvlTreeTester::check_addAndCount(const BinaryTree* tree, const int size)
 {
 	BinaryTreeTester::check_addAndCount(tree, size);
+    if (useConsoleOutput()) {
+        tree->print_3(tree->root());
+        std::cout << "=============================\n";
+    }
 	assert(tree->isBalanced() && isSearchTree(tree));
 }
 

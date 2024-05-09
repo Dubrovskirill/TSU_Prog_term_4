@@ -183,6 +183,7 @@ void BinaryTreeTester::remove()
 void BinaryTreeTester::check_remove(BinaryTree* tree, const int key,
     const bool result, const int size)
 {
+    
     assert(tree->remove(key) == result);
     assert(tree->size() == size);
 }
