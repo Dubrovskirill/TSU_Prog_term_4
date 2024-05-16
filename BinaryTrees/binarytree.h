@@ -20,6 +20,7 @@ public:
 
    void clearChildren(Node *root);
    void clear();
+   void clearRecursive(Node* root);
 
    int size() const;
    virtual int min() const;
@@ -65,10 +66,10 @@ public:
 
    std::vector<int> bypassLnr()const;
 
-   virtual bool remove(const int key);
+   virtual bool remove(const int & key);
 protected:
     
-    virtual bool removeRecursive(Node* root, const int key);
+    virtual bool removeRecursive(Node* root, const int& key);
     virtual bool removeRootNode(Node* node);
     virtual bool removeLeafNode(Node* node);
     virtual bool removeNodeWithOneChild(Node* node);

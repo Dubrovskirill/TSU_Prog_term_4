@@ -160,7 +160,7 @@ bool SearchTree::removeNodeWithTwoChildren(Node* node) {
                 parentNode->setRight(replacementNode);
         }
     }
-
+    delete node;
     return true;
 }
 
@@ -172,7 +172,7 @@ BinaryTree::Node* SearchTree::findReplacement(Node* root) const {
 }
 
 
-bool SearchTree::removeRecursive(Node* root, const int key)
+bool SearchTree::removeRecursive(Node* root, const int& key)
 {
     if (!root)
         return false;

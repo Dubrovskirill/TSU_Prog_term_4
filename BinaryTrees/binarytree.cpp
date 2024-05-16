@@ -48,6 +48,7 @@ BinaryTree::Node* BinaryTree::_copy(Node* root) const
 
 void BinaryTree::clearChildren(Node *root)
 {
+
     if (!root)
         return;
     std::list<Node*> listForClearNode;
@@ -67,9 +68,27 @@ void BinaryTree::clearChildren(Node *root)
 
 void BinaryTree::clear()
 {
-    clearChildren(m_root);
-    delete m_root;
+    clearRecursive(m_root);
     m_root = nullptr;
+}
+
+void BinaryTree::clearRecursive(Node* root)
+{
+    if (!root) {
+        return;
+    }
+    if (root->getLeft()) {
+        clearRecursive(root->getLeft());
+        root->setLeft(nullptr);
+    }
+    if (root->getRight()) {
+        clearRecursive(root->getRight());
+        root->setRight(nullptr);
+    }
+
+    delete root;
+   
+
 }
 
 void BinaryTree::nodeList(std::list<Node*>& nodeList) const
@@ -322,13 +341,13 @@ BinaryTree::Node* BinaryTree::parent(const Node* child) const
     return nullptr;
 }
 
-bool BinaryTree::remove(const int key)
+bool BinaryTree::remove(const int& key)
 {
     return removeRecursive(m_root, key);
 }
 
 
-bool BinaryTree::removeRecursive(Node* root, const int key)
+bool BinaryTree::removeRecursive(Node* root, const int& key)
 {
     if (!root)
         return false;

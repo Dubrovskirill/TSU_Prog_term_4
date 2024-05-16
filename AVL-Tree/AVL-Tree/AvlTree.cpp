@@ -13,7 +13,7 @@ BinaryTree::Node* AvlTree::_addNode(Node* root, const int key){
         
         if (!isFixed) {
             root->setBalance(root->getBalance() - 1);
-            balance—orrection(root);
+            balanceCorrection(root);
         }
     }
     else if (key > root->getKey()) {
@@ -21,7 +21,7 @@ BinaryTree::Node* AvlTree::_addNode(Node* root, const int key){
         
         if (!isFixed) {
             root->setBalance(root->getBalance() + 1);
-            balance—orrection(root);
+            balanceCorrection(root);
         }
     }
    if(root==m_root)
@@ -34,7 +34,7 @@ int AvlTree::bFactor(Node* node) const {
     return height(node->getRight()) - height(node->getLeft());
 }
 
-void AvlTree::balance—orrection(Node*& root,bool addOrRem) {
+void AvlTree::balanceCorrection(Node*& root,bool addOrRem) {
 
     Node* p = parent(root);
     if (p == root)
@@ -57,7 +57,7 @@ void AvlTree::balance—orrection(Node*& root,bool addOrRem) {
             isFixed = true;
             break;
         }
-        balance—orrection(root, addOrRem);
+       balanceCorrection(root, addOrRem);
        
         break;
 
@@ -73,7 +73,7 @@ void AvlTree::balance—orrection(Node*& root,bool addOrRem) {
             isFixed = true;
             break;
         }
-        balance—orrection(root, addOrRem);
+        balanceCorrection(root, addOrRem);
         
 
         break;
@@ -91,9 +91,6 @@ void AvlTree::balance—orrection(Node*& root,bool addOrRem) {
     default:
         break;
     }
-   
-    
-
 }
 
 BinaryTree::Node* AvlTree::turnRight(Node* middle, Node* top) {
@@ -180,13 +177,13 @@ AvlTree AvlTree::copy(Node* root) const
 }
 
 
-bool AvlTree::remove(const int key)
+bool AvlTree::remove(const int& key)
 {
     
     return (removeRecursive(m_root, key) ? isFixed = true : false); 
 }
 
-bool AvlTree::removeRecursive(Node* root, const int key)
+bool AvlTree::removeRecursive(Node* root, const int& key)
 {
     if (!root)
         return isRemove=false;
@@ -212,14 +209,14 @@ bool AvlTree::removeRecursive(Node* root, const int key)
         removeRecursive(root->getLeft(), key);
         if (!isFixed) {
             root->m_balance += 1;
-            balance—orrection(root, true);
+            balanceCorrection(root, true);
         }
     }
     else {
         removeRecursive(root->getRight(), key);
         if (!isFixed) {
             root->m_balance -= 1;
-            balance—orrection(root, true);
+            balanceCorrection(root, true);
         }
     }
     
@@ -277,18 +274,18 @@ void AvlTree::route(Node* from, Node* to)
         route(from->getLeft(), to);
         if (!isFixed) {
             from->m_balance += 1;
-            balance—orrection(from, true);
+            balanceCorrection(from, true);
         }
     }
     else  if (from->getKey() < to->getKey()) {
         route(from->getRight(), to);
         if (!isFixed) {
             from->m_balance -= 1;
-            balance—orrection(from, true);
+            balanceCorrection(from, true);
         }
     }
     else {
-        balance—orrection(from, true);
+        balanceCorrection(from, true);
     }
     return;
 }

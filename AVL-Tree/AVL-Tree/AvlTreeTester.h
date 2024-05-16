@@ -1,10 +1,10 @@
 #pragma once
-#include"../../BinarySearchTree/SearchTreeTester.h"
+#include "..\..\BinarySearchTree\SearchTreeTester.h"
 
 class AvlTreeTester : public SearchTreeTester
 {
 public:
-    AvlTreeTester(const bool useConsoleOutput, const bool enableAllTests = true);
+	AvlTreeTester(const bool useConsoleOutput, const bool enableAllTests = true);
 	~AvlTreeTester() override = default;
 protected:
     BinaryTree* allocateTree()override;

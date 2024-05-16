@@ -18,11 +18,8 @@ BinaryTree* AvlTreeTester::allocateTree()
 void AvlTreeTester::check_addAndCount(const BinaryTree* tree, const int size)
 {
 	BinaryTreeTester::check_addAndCount(tree, size);
-    if (useConsoleOutput()) {
-        tree->print_3(tree->root());
-        std::cout << "=============================\n";
-    }
-	assert(tree->isBalanced() && isSearchTree(tree));
+	assert(isSearchTree(tree));
+    assert(tree->isBalanced());
 }
 
 void AvlTreeTester::check_remove(BinaryTree* tree, const int key, const bool result, const int size)
@@ -35,7 +32,8 @@ void AvlTreeTester::check_remove(BinaryTree* tree, const int key, const bool res
 void AvlTreeTester::check_clear(const BinaryTree* tree, const int size)
 {
 	BinaryTreeTester::check_clear(tree, size);
-	assert(isSearchTree(tree) && tree->isBalanced());
+    assert(isSearchTree(tree));
+    assert(tree->isBalanced());
 }
 
 void AvlTreeTester::check_assign(const BinaryTree* first, const BinaryTree* second)

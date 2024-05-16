@@ -35,7 +35,7 @@ protected:
     Node* _addNode(Node* root, const int key) override;
     BinaryTree::Node* findReplacement(Node* root) const;
 
-    bool removeRecursive(Node* root, const int key) override;
+    bool removeRecursive(Node* root, const int & key) override;
     bool removeLeafNode(Node* node) override;
     bool removeNodeWithOneChild(Node* node) override;
     bool removeNodeWithTwoChildren(Node* node) override;

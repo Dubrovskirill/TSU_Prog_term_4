@@ -18,11 +18,17 @@ void BinaryTreeTester::test(const int size)
 {
     m_maxSize = size;
     addAndCount();
+    std::cout << "Add correct\n";
     destructor();
+    std::cout << "destructor correct\n";
     remove();
+    std::cout << "remove correct\n";
     clear();
+    std::cout << "clear correct\n";
     assign();
+    std::cout << "assign correct\n";
     height();
+    std::cout << "height correct\n";
 }
 
 bool BinaryTreeTester::addAndCountCheckEnabled() const

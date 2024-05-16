@@ -12,17 +12,17 @@ public:
     AvlTree copy(Node* root) const;
     AvlTree& operator = (const AvlTree& other) = default;
     bool isFixed = true;
-     bool remove(const int key) override;
+     bool remove(const int & key) override;
 protected:
     Node* _addNode(Node* root, const int key) override;
     int bFactor(Node* node) const;
-    void balance—orrection(Node*& root, bool addOrRem=false); // false - add,  true -  remove;
+    void balanceCorrection(Node*& root, bool addOrRem=false); // false - add,  true -  remove;
     Node* turnRight(Node* middle, Node* top);
     Node* turnLeft(Node* middle, Node* top);
     Node* turnDoubleRL(Node* middle, Node* top);
     Node* turnDoubleLR(Node* middle, Node* top);
 
-    bool removeRecursive(Node* root, const int key) override;
+    bool removeRecursive(Node* root, const int& key) override;
     bool removeNodeWithTwoChildren(Node* node) override;
     void route(Node* from, Node* to);
 
