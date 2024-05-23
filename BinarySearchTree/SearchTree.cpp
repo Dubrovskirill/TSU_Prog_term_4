@@ -172,7 +172,7 @@ BinaryTree::Node* SearchTree::findReplacement(Node* root) const {
 }
 
 
-bool SearchTree::removeRecursive(Node* root, const int& key)
+bool SearchTree::removeRecursive(Node* parent,Node* root, const int& key)
 {
     if (!root)
         return false;
@@ -191,11 +191,34 @@ bool SearchTree::removeRecursive(Node* root, const int& key)
 
     }
     else if (root->getKey() > key) {
-        removeRecursive(root->getLeft(), key);
+        removeRecursive(root,root->getLeft(), key);
     }
     else { 
-        removeRecursive(root->getRight(), key);
+        removeRecursive(root,root->getRight(), key);
     }
 
+}
+
+SearchTree::Node* SearchTree::parent(const Node* child) const
+{
+    return _parent(m_root,m_root, child);
+}
+
+SearchTree::Node* SearchTree::_parent(Node* parent,Node* root, const Node* child) const
+{
+    if (m_root == child)
+        return m_root;
+    if (child->getKey() < root->getKey()) {
+        return _parent(root, root->getLeft(), child);
+
+    }
+    else if (child->getKey() > root->getKey()) {
+        return _parent(root, root->getRight(), child);
+        
+    }
+    else if (child->getKey() == root->getKey()) {
+        return parent;
+    }
+    return nullptr;
 }
 

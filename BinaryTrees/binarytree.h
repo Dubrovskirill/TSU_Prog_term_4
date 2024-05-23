@@ -40,7 +40,7 @@ public:
    Node* root() const;
   
    Node* find(const int key) const;
-   Node* parent(const Node* child) const;
+   virtual Node* parent(const Node* child) const;
    virtual Node* find(Node* root, const int key) const;
    Node* add(const int key);
   
@@ -69,7 +69,7 @@ public:
    virtual bool remove(const int & key);
 protected:
     
-    virtual bool removeRecursive(Node* root, const int& key);
+    virtual bool removeRecursive(Node* parent,Node* root, const int& key);
     virtual bool removeRootNode(Node* node);
     virtual bool removeLeafNode(Node* node);
     virtual bool removeNodeWithOneChild(Node* node);

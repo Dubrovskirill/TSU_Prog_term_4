@@ -321,6 +321,8 @@ BinaryTree::Node* BinaryTree::parent(const Node* child) const
 {
     if (m_root == child)
         return m_root;
+
+
     Node* current = nullptr;
     std::list<Node*> nodeL;
     nodeL.push_back(m_root);
@@ -338,16 +340,17 @@ BinaryTree::Node* BinaryTree::parent(const Node* child) const
         }
         nodeL.pop_front();
     }
+
     return nullptr;
 }
 
 bool BinaryTree::remove(const int& key)
 {
-    return removeRecursive(m_root, key);
+    return removeRecursive(m_root,m_root, key);
 }
 
 
-bool BinaryTree::removeRecursive(Node* root, const int& key)
+bool BinaryTree::removeRecursive(Node* parent,Node* root, const int& key)
 {
     if (!root)
         return false;
@@ -367,9 +370,9 @@ bool BinaryTree::removeRecursive(Node* root, const int& key)
         return removeNodeWithOneChild(root);
 
     }
-    if (!removeRecursive(root->getLeft(), key)) {
+    if (!removeRecursive(root, root->getLeft(), key)) {
 
-        return  removeRecursive(root->getRight(), key);
+        return  removeRecursive(root, root->getRight(), key);
     }
     
 }

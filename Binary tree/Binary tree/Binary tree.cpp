@@ -5,6 +5,7 @@
 #include "../../BinarySearchTree/SearchTreeTester.h"
 
 #include "../../BinaryTrees/binarytree.h"
+#include "../../BinaryTrees/BinaryTreeTester.h"
 int main()
 {
     SearchTreeTester tester(false);
