@@ -18,11 +18,17 @@ void BinaryTreeTester::test(const int size)
 {
     m_maxSize = size;
     addAndCount();
+    std::cout << "Add correct\n";
     destructor();
+    std::cout << "destructor correct\n";
     remove();
+    std::cout << "remove correct\n";
     clear();
+    std::cout << "clear correct\n";
     assign();
+    std::cout << "assign correct\n";
     height();
+    std::cout << "height correct\n";
 }
 
 bool BinaryTreeTester::addAndCountCheckEnabled() const
@@ -137,8 +143,8 @@ void BinaryTreeTester::destructor()
         }
         deallocateTree(tree);
     }
-    std::cout << "BinaryTreeTester::destructor ended. Press any key to continue..." << std::endl;
-    getchar();
+
+    
 
 }
 
@@ -183,6 +189,7 @@ void BinaryTreeTester::remove()
 void BinaryTreeTester::check_remove(BinaryTree* tree, const int key,
     const bool result, const int size)
 {
+    
     assert(tree->remove(key) == result);
     assert(tree->size() == size);
 }
@@ -202,9 +209,9 @@ void BinaryTreeTester::clear()
         tree->clear();
         check_clear(tree, 0);
     }
+
     deallocateTree(tree);
-    std::cout << "BinaryTreeTester::clear ended. Press any key to continue..." << std::endl;
-    getchar();
+   
 }
 
 void BinaryTreeTester::check_clear(const BinaryTree* tree, const int size)

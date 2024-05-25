@@ -17,7 +17,8 @@ public:
 
     Node* find(const int key) const;
     Node* find(Node* root, const int key) const override;
-
+    Node* parent(const Node* child) const override;
+    Node* _parent(Node* parent, Node* root, const Node* child) const;
     int min() const override;
     int max() const override;
     int level(const int key) const;
@@ -26,21 +27,19 @@ public:
     std::vector<int> keysVector() const;
     std::vector<int> keysVector(Node* root, std::vector<int>& keys)const;
 
+    SearchTree& operator = (const SearchTree& other) = default;
 
 
-    bool remove(const int key) override;
 
 
 protected:
     Node* _addNode(Node* root, const int key) override;
-
-private:
-    bool removeRootNode(Node* node);
-    bool removeLeafNode(Node* node);
-    bool removeNodeWithOneChild(Node* node);
-    bool removeNodeWithTwoChildren(Node* node);
     BinaryTree::Node* findReplacement(Node* root) const;
 
+    bool removeRecursive(Node* parent,Node* root, const int & key) override;
+    bool removeLeafNode(Node* node) override;
+    bool removeNodeWithOneChild(Node* node) override;
+    bool removeNodeWithTwoChildren(Node* node) override;
 };
 
 #endif // SEARCHTREE_H

@@ -20,6 +20,7 @@ public:
 
    void clearChildren(Node *root);
    void clear();
+   void clearRecursive(Node* root);
 
    int size() const;
    virtual int min() const;
@@ -37,12 +38,12 @@ public:
    bool isEmpty() const;
   
    Node* root() const;
+  
    Node* find(const int key) const;
-   Node* parent(const Node* child) const;
+   virtual Node* parent(const Node* child) const;
    virtual Node* find(Node* root, const int key) const;
    Node* add(const int key);
-   virtual bool remove(const int key);
-
+  
    void printHorizontal(Node* root, int marginLeft, int levelSpacing) const;
    void printHorizontal() const;
    void print(Node* root, int leftBorderPos = 10, int rightBorderPos = 100, int yPos = 0) const;
@@ -59,17 +60,20 @@ public:
    
    void print_2(Node* root,int level, int xPos, int yPos, int xShift) const;
    void print_2(Node* root) const;
-  
-   void printSpaces(int count);
-   void print_3(Node* root);
+   void printSpaces(int count) const;
+   void print_3(Node* root) const;
    
-   
+
    std::vector<int> bypassLnr()const;
-private:
-    bool removeRootNode(Node* node);
-    bool removeLeafNode(Node* node);
-    bool removeNodeWithTwoChildren(Node* node);
-    bool removeNodeWithOneChild(Node* node);
+
+   virtual bool remove(const int & key);
+protected:
+    
+    virtual bool removeRecursive(Node* parent,Node* root, const int& key);
+    virtual bool removeRootNode(Node* node);
+    virtual bool removeLeafNode(Node* node);
+    virtual bool removeNodeWithOneChild(Node* node);
+    virtual bool removeNodeWithTwoChildren(Node* node);
 
 protected:
    virtual BinaryTree::Node* _addNode(Node* root, const int key);
@@ -100,12 +104,18 @@ public:
     void setLeft(Node* left);
     void setRight(Node* right);
 
-
+    int getBalance() const { return m_balance; }
+    void setBalance(int newB) { m_balance = newB; }
+    int m_balance = 0;
 private:
+    
+private:
+   
     int m_key = 0;
     Node* m_left = nullptr;
     Node* m_right = nullptr;
 
+    
 };
 
 

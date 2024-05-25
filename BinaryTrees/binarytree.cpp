@@ -48,6 +48,7 @@ BinaryTree::Node* BinaryTree::_copy(Node* root) const
 
 void BinaryTree::clearChildren(Node *root)
 {
+
     if (!root)
         return;
     std::list<Node*> listForClearNode;
@@ -67,9 +68,27 @@ void BinaryTree::clearChildren(Node *root)
 
 void BinaryTree::clear()
 {
-    clearChildren(m_root);
-    delete m_root;
+    clearRecursive(m_root);
     m_root = nullptr;
+}
+
+void BinaryTree::clearRecursive(Node* root)
+{
+    if (!root) {
+        return;
+    }
+    if (root->getLeft()) {
+        clearRecursive(root->getLeft());
+        root->setLeft(nullptr);
+    }
+    if (root->getRight()) {
+        clearRecursive(root->getRight());
+        root->setRight(nullptr);
+    }
+
+    delete root;
+   
+
 }
 
 void BinaryTree::nodeList(std::list<Node*>& nodeList) const
@@ -302,6 +321,8 @@ BinaryTree::Node* BinaryTree::parent(const Node* child) const
 {
     if (m_root == child)
         return m_root;
+
+
     Node* current = nullptr;
     std::list<Node*> nodeL;
     nodeL.push_back(m_root);
@@ -319,24 +340,41 @@ BinaryTree::Node* BinaryTree::parent(const Node* child) const
         }
         nodeL.pop_front();
     }
+
     return nullptr;
 }
 
-bool BinaryTree::remove(const int key)
+bool BinaryTree::remove(const int& key)
 {
+    return removeRecursive(m_root,m_root, key);
+}
 
-    Node* removableNode = find(key);
-    if (!removableNode)
+
+bool BinaryTree::removeRecursive(Node* parent,Node* root, const int& key)
+{
+    if (!root)
         return false;
 
-    if (removableNode == m_root)
-        return removeRootNode(removableNode);
-    if (!removableNode->getLeft() && !removableNode->getRight())
-        return removeLeafNode(removableNode);
-    if (removableNode->getLeft() && removableNode->getRight())
-        return removeNodeWithTwoChildren(removableNode);
+    if (root->getKey() == key) {
+       
+        if (!root)
+            return false;
 
-    return removeNodeWithOneChild(removableNode);
+        if (root == m_root)
+            return removeRootNode(root);
+        if (!root->getLeft() && !root->getRight())
+            return removeLeafNode(root);
+        if (root->getLeft() && root->getRight())
+            return removeNodeWithTwoChildren(root);
+
+        return removeNodeWithOneChild(root);
+
+    }
+    if (!removeRecursive(root, root->getLeft(), key)) {
+
+        return  removeRecursive(root, root->getRight(), key);
+    }
+    
 }
 bool BinaryTree::removeRootNode(Node* node)
 {
@@ -355,7 +393,7 @@ bool BinaryTree::removeRootNode(Node* node)
     parentNode = parent(replacementNode);
     if (parentNode->getLeft() == replacementNode)
         parentNode->setLeft(nullptr);
-    else if(parentNode->getRight() == replacementNode)
+    else if (parentNode->getRight() == replacementNode)
         parentNode->setRight(nullptr);
     replacementNode->setLeft(node->m_left);
     replacementNode->setRight(node->m_right);
@@ -405,7 +443,7 @@ bool BinaryTree::removeNodeWithOneChild(Node* node)
     Node* replacementNode = nullptr;
     if (node->getLeft())
         replacementNode = node->getLeft();
-    else if(node->getRight())
+    else if (node->getRight())
         replacementNode = node->getRight();
     if (parentNode->getLeft() == node)
         parentNode->setLeft(replacementNode);
@@ -505,7 +543,7 @@ void BinaryTree::print(Node* root, int leftBorderPos, int rightBorderPos, int yP
     print(root->getLeft(), leftBorderPos, xPos, yPos + 2);
     print(root->getRight(), xPos, rightBorderPos, yPos + 2);
 }
-//не работает
+
 void BinaryTree::moveCursor(int xPos, int yPos) const
 {
     COORD coord;
@@ -540,14 +578,14 @@ void BinaryTree::print_2(Node* root) const {
 }
 
 
-void BinaryTree::printSpaces(int count) 
+void BinaryTree::printSpaces(int count) const
 {
     for (int i = 0; i < count; ++i) 
         std::cout << "  "; 
 }
 
 
-void BinaryTree::print_3(Node* root)
+void BinaryTree::print_3(Node* root) const
 {
     int he = height(root);
     std::queue<Node*> q;
@@ -600,3 +638,6 @@ void BinaryTree::_bypassLRR(Node* root, std::vector<int>& keys)const
         keys.push_back(root->getKey());
         _bypassLRR(root->getRight(), keys);
 }
+
+
+

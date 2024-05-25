@@ -96,22 +96,6 @@ std::vector<int> SearchTree::keysVector(Node* root, std::vector<int>& keys)const
     keysVector(root->getRight(), keys);
 }
 
-
-bool SearchTree::remove(const int key) {
-    Node* node = find(key);
-    if (!node)
-        return false;
-    if (!node->getLeft() && !node->getRight())
-        return removeLeafNode(node);
-    else if (!node->getLeft() || !node->getRight())
-        return removeNodeWithOneChild(node);
-    else
-        return removeNodeWithTwoChildren(node);
-
-    return false;
-}
-
-
 bool SearchTree::removeLeafNode(Node* node) {
     Node* parentNode = parent(node);
     if (node == m_root)
@@ -176,7 +160,7 @@ bool SearchTree::removeNodeWithTwoChildren(Node* node) {
                 parentNode->setRight(replacementNode);
         }
     }
-
+    delete node;
     return true;
 }
 
@@ -188,5 +172,53 @@ BinaryTree::Node* SearchTree::findReplacement(Node* root) const {
 }
 
 
+bool SearchTree::removeRecursive(Node* parent,Node* root, const int& key)
+{
+    if (!root)
+        return false;
 
+    if (root->getKey() == key) {
+
+        if (!root->getLeft() && !root->getRight()) {
+            return removeLeafNode(root);
+        }
+        else if (!root->getLeft() || !root->getRight()) {
+            return removeNodeWithOneChild(root);
+        }
+        else {
+            return removeNodeWithTwoChildren(root);
+        }
+
+    }
+    else if (root->getKey() > key) {
+        removeRecursive(root,root->getLeft(), key);
+    }
+    else { 
+        removeRecursive(root,root->getRight(), key);
+    }
+
+}
+
+SearchTree::Node* SearchTree::parent(const Node* child) const
+{
+    return _parent(m_root,m_root, child);
+}
+
+SearchTree::Node* SearchTree::_parent(Node* parent,Node* root, const Node* child) const
+{
+    if (m_root == child)
+        return m_root;
+    if (child->getKey() < root->getKey()) {
+        return _parent(root, root->getLeft(), child);
+
+    }
+    else if (child->getKey() > root->getKey()) {
+        return _parent(root, root->getRight(), child);
+        
+    }
+    else if (child->getKey() == root->getKey()) {
+        return parent;
+    }
+    return nullptr;
+}
 
