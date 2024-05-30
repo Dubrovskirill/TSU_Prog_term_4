@@ -142,10 +142,219 @@ void HuffmanTree::printHorizontal(Node* root, int marginLeft, int levelSpacing) 
 	printHorizontal(root->left(), marginLeft + levelSpacing, levelSpacing);
 }
 
+void prependDataToFile(const std::string& originFilename, const int data)
+{
+	std::ifstream inputFile(originFilename, std::ios::binary);
+	if (!inputFile.is_open()) {
+		std::cerr << "Failed to open file for reading:: " << originFilename << std::endl;
+		return;
+	}
+
+	std::string tempFileName = "temp_" + originFilename;
+	std::ofstream outputFile(tempFileName, std::ios::binary);
+	if (!outputFile.is_open()) {
+		std::cerr << "Failed to create a temporary file:" << tempFileName << std::endl;
+		return;
+	}
+
+	outputFile << data;
+	outputFile << inputFile.rdbuf();
+
+	outputFile.close();
+	inputFile.close();
+
+	if (std::remove(originFilename.c_str())) {
+		std::cerr << "Error delete: " << originFilename << std::endl;
+		return;
+	}
+
+	if (std::rename(tempFileName.c_str(), originFilename.c_str())) {
+		std::cerr << "Error rename: " << tempFileName << std::endl;
+		return;
+	}
+}
+
+float HuffmanTree::encode(const std::string& inputFilename, const std::string& outputFilename)
+{
+	if (!m_root)
+		build(inputFilename);
+
+	std::ifstream inputFile(inputFilename, std::ios::binary);
+	if (!inputFile.is_open())
+	{
+		std::cerr << "Failed to open file for reading: " << inputFilename << std::endl;
+		return -1;
+	}
+
+	std::ofstream outputFile(outputFilename, std::ios::binary);
+	if (!outputFile.is_open())
+	{
+		std::cerr << "Failed to open file for writing: " << outputFilename << std::endl;
+		return -1;
+	}
+
+	unsigned char ch;
+	BoolVector code(256, 0);
+	int pos = 0;
+	int countCharInput = 0, countCharOutput = 0;
+	inputFile >> std::noskipws;
+	inputFile >> ch;
+	++countCharInput;
+	while (!inputFile.eof())
+	{
+		if (!encodeSymbol(ch, code, pos))
+		{
+			std::cerr << "Encoding failed: the function is called by another tree" << std::endl;
+			return 0;
+		}
+
+		const unsigned char* symbPtr = code.Data();
+		int i = 0;
+		for (; i < (pos / 8); ++i)
+		{
+			outputFile << symbPtr[i];
+			++countCharOutput;
+		}
+		if (pos / 8)
+		{
+			code = code << i * 8;
+			pos = pos % 8;
+		}
+
+		inputFile >> ch;
+		++countCharInput;
+		if (inputFile.eof() && (pos % 8))
+		{
+			outputFile << symbPtr[0];
+			++countCharOutput;
+		}
+	}
+	--countCharInput;
+	inputFile.close();
+	outputFile.close();
+
+	if (pos == 0)
+	{
+		prependDataToFile(outputFilename, 0);
+	}
+	else
+	{
+		prependDataToFile(outputFilename, 8 - pos);
+	}
+
+	return ((static_cast<float>(countCharOutput) / static_cast<float>(countCharInput)) * 100);
+}
 
 
 
+bool HuffmanTree::encodeSymbol(const char symbol, BoolVector& code, int& pos)
+{
 
+	if (!m_root)
+		return false;
+
+	Node* currentNode = m_root;
+	while (currentNode->left() || currentNode->right())
+	{
+		if (currentNode->symbols()[static_cast<int>(symbol)])
+		{
+			code[pos++] = true;
+			currentNode = currentNode->right();
+		}
+		else
+		{
+			code[pos++] = false;
+			currentNode = currentNode->left();
+		}
+	}
+
+	return true;
+}
+
+
+bool HuffmanTree::decode(const std::string& encodedFilename, const std::string& decodedFilename)
+{
+	if (!m_root)
+		return false;
+
+	std::ifstream inputFile(encodedFilename, std::ios::binary);
+	if (!inputFile.is_open())
+	{
+		std::cerr << "Failed to open file for reading: " << encodedFilename << std::endl;
+		return false;
+	}
+
+	std::ofstream outputFile(decodedFilename, std::ios::binary);
+	if (!outputFile.is_open())
+	{
+		std::cerr << "Failed to open file for writing: " << decodedFilename << std::endl;
+		return false;
+	}
+
+	DecodeData data;
+	data.m_currentNode = m_root;
+
+	unsigned char ch;
+	inputFile >> std::noskipws;
+	inputFile >> ch;
+	while (!data.m_flagEOF)
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			bool bit = (ch & (1 << (7 - i))) != 0;
+			if (bit)
+			{
+				data.m_currentNode = data.m_currentNode->right();
+			}
+			else
+			{
+				data.m_currentNode = data.m_currentNode->left();
+			}
+
+			if (!data.m_currentNode->left() && !data.m_currentNode->right())
+			{
+				// Найден листовой узел, определите символ по коллекции символов
+				for (int j = 0; j < data.m_currentNode->symbols().Lenght(); j++)
+				{
+					if (data.m_currentNode->symbols()[j])
+					{
+						outputFile << static_cast<char>(j);
+						break;
+					}
+				}
+				data.m_currentNode = m_root;
+			}
+		}
+
+		inputFile >> ch;
+		data.m_position++;
+		if (inputFile.eof())
+		{
+			data.m_flagEOF = true;
+			data.m_insignificantBits = (8 - (data.m_position * 8 - encodedFileSize(encodedFilename))) % 8;
+		}
+	}
+
+	inputFile.close();
+	outputFile.close();
+
+	return true;
+}
+
+int HuffmanTree::encodedFileSize(const std::string& filename)
+{
+	std::ifstream inputFile(filename, std::ios::binary);
+	if (!inputFile.is_open())
+	{
+		std::cerr << "Failed to open file for reading: " << filename << std::endl;
+		return -1;
+	}
+
+	inputFile.seekg(0, std::ios::end);
+	int fileSize = inputFile.tellg();
+	inputFile.close();
+	return fileSize;
+}
 
 
 HuffmanTree::Node::Node(const BoolVector& symbols, const int frequency, Node* left, Node* right)
