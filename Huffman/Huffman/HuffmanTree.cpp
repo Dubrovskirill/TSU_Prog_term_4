@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <queue>
+#include<map>
 
 void HuffmanTree::clear(Node* root) {
 	if (!root) {
@@ -21,9 +22,17 @@ void HuffmanTree::clear(Node* root) {
 	delete root;
 }
 
+
+
+
+
+
+
+
+
 void HuffmanTree::build(const std::string& fileName) {
 	clear(m_root);
-	
+
 	std::ifstream inputFile(fileName, std::ios::binary);
 	if (!inputFile.is_open())
 	{
@@ -59,16 +68,18 @@ void HuffmanTree::createHuffmanTree()
 			symbols[i] = true;
 			Node* node = new Node(symbols, m_frequencyTable[i]);
 			pq.push(node);
-			
+
 		}
 	}
-	
+
 
 	while (pq.size() > 1)
 	{
 		Node* left = pq.top();
+		printSim(left->symbols());
 		pq.pop();
 		Node* right = pq.top();
+		printSim(right->symbols());
 		pq.pop();
 
 		BoolVector combinedSymbols = left->symbols() | right->symbols();
@@ -77,12 +88,28 @@ void HuffmanTree::createHuffmanTree()
 		pq.push(parent);
 	}
 
-	
+
 	m_root = pq.top();
 	pq.pop();
-	
+
 }
 
+void HuffmanTree::printSim(const BoolVector& vec1)
+{
+	int order1 = 0;
+	for (int i = 0; i < vec1.CellCount(); ++i)
+	{
+		uint8_t mask = 1 << (vec1.m_cellSize - 1);
+		for (int j = 0; j < vec1.m_cellSize; ++j)
+		{
+			if (vec1.Data()[i] & mask)
+				break;
+			mask >>= 1;
+			++order1;
+		}
+	}
+	std::cout << order1<<" ";
+}
 bool HuffmanTree::NodeComparator::operator()(const Node* lhs, const Node* rhs) const
 {
 	if (lhs->frequency() == rhs->frequency()) {
@@ -91,36 +118,40 @@ bool HuffmanTree::NodeComparator::operator()(const Node* lhs, const Node* rhs) c
 	return lhs->frequency() > rhs->frequency();
 }
 
- bool HuffmanTree::comparisonAlphafit(const BoolVector& vec1, const BoolVector& vec2)  {
-	 int order1 = 0;
-	 for (int i = 0; i < vec1.CellCount(); ++i)
-	 {
-		 uint8_t mask = 1 << (vec1.m_cellSize - 1);
-		 for (int j = 0; j < vec1.m_cellSize; ++j)
-		 {
-			 if (vec1.Data()[i] & mask)
-				 break;
-			 mask >>= 1;
-			 ++order1;
-		 }
-	 }
-	 
+bool HuffmanTree::comparisonAlphafit(const BoolVector& vec1, const BoolVector& vec2) {
+	int order1 = 0;
+	for (int i = 0; i < vec1.CellCount(); ++i)
+	{
+		uint8_t mask = 1 << (vec1.m_cellSize - 1);
+		for (int j = 0; j < vec1.m_cellSize; ++j)
+		{
+			if (vec1.Data()[i] & mask)
+				break;
+			mask >>= 1;
+			++order1;
+		}
+	}
 
-	 int order2 = 0;
-	 for (int i = 0; i < vec2.CellCount(); ++i)
-	 {
-		 uint8_t mask = 1 << (vec2.m_cellSize - 1);
-		 for (int j = 0; j < vec2.m_cellSize; ++j)
-		 {
-			 if (vec2.Data()[i] & mask)
-				 break;
-			 mask >>= 1;
-			 ++order2;
-		 }
-	 }
+
+	int order2 = 0;
+	for (int i = 0; i < vec2.CellCount(); ++i)
+	{
+		uint8_t mask = 1 << (vec2.m_cellSize - 1);
+		for (int j = 0; j < vec2.m_cellSize; ++j)
+		{
+			if (vec2.Data()[i] & mask)
+				break;
+			mask >>= 1;
+			++order2;
+		}
+	}
 
 	return order1 > order2;
 }
+
+
+
+
 
 void HuffmanTree::printHorizontal() const
 {
@@ -247,7 +278,7 @@ float HuffmanTree::encode(const std::string& inputFilename, const std::string& o
 
 
 
-bool HuffmanTree::encodeSymbol(const char symbol, BoolVector& code, int& pos)
+bool HuffmanTree::encodeSymbol(const unsigned char symbol, BoolVector& code, int& pos)
 {
 
 	if (!m_root)
@@ -291,47 +322,67 @@ bool HuffmanTree::decode(const std::string& encodedFilename, const std::string& 
 		return false;
 	}
 
-	DecodeData data;
-	data.m_currentNode = m_root;
-
 	unsigned char ch;
+	int insignificantBits;
 	inputFile >> std::noskipws;
-	inputFile >> ch;
-	while (!data.m_flagEOF)
+	inputFile >> insignificantBits;
+
+	Node* currentNode = m_root;
+
+	while (!inputFile.eof())
 	{
+		inputFile >> ch;
 		for (int i = 0; i < 8; i++)
 		{
 			bool bit = (ch & (1 << (7 - i))) != 0;
 			if (bit)
 			{
-				data.m_currentNode = data.m_currentNode->right();
+				currentNode = currentNode->right();
 			}
 			else
 			{
-				data.m_currentNode = data.m_currentNode->left();
+				currentNode = currentNode->left();
 			}
 
-			if (!data.m_currentNode->left() && !data.m_currentNode->right())
+			if (!currentNode->left() && !currentNode->right())
 			{
-				// Найден листовой узел, определите символ по коллекции символов
-				for (int j = 0; j < data.m_currentNode->symbols().Lenght(); j++)
+				for (int j = 0; j < currentNode->symbols().Lenght(); j++)
 				{
-					if (data.m_currentNode->symbols()[j])
+					if (currentNode->symbols()[j])
 					{
 						outputFile << static_cast<char>(j);
 						break;
 					}
 				}
-				data.m_currentNode = m_root;
+				currentNode = m_root;
 			}
 		}
+	}
 
-		inputFile >> ch;
-		data.m_position++;
-		if (inputFile.eof())
+	
+	for (int i = 0; i < 8 - insignificantBits; i++)
+	{
+		bool bit = (ch & (1 << (7 - i))) != 0;
+		if (bit)
 		{
-			data.m_flagEOF = true;
-			data.m_insignificantBits = (8 - (data.m_position * 8 - encodedFileSize(encodedFilename))) % 8;
+			currentNode = currentNode->right();
+		}
+		else
+		{
+			currentNode = currentNode->left();
+		}
+
+		if (!currentNode->left() && !currentNode->right())
+		{
+			for (int j = 0; j < currentNode->symbols().Lenght(); j++)
+			{
+				if (currentNode->symbols()[j])
+				{
+					outputFile << static_cast<char>(j);
+					break;
+				}
+			}
+			currentNode = m_root;
 		}
 	}
 
@@ -355,6 +406,8 @@ int HuffmanTree::encodedFileSize(const std::string& filename)
 	inputFile.close();
 	return fileSize;
 }
+
+
 
 
 HuffmanTree::Node::Node(const BoolVector& symbols, const int frequency, Node* left, Node* right)
@@ -393,6 +446,4 @@ void HuffmanTree::Node::right(Node* right)
 {
 	m_right = right;
 }
-
-
 
