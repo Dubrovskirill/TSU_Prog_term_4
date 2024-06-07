@@ -18,9 +18,18 @@
     <ClInclude Include="HuffmanTree.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\TSU_Prog\OOP\OOP_LAB_3_(Сlass of boolean vector)\OOP_LAB_3_(Сlass of boolean vector)\BoolVector.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HuffmanTree.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\TSU_Prog\OOP\OOP_LAB_3_(Сlass of boolean vector)\OOP_LAB_3_(Сlass of boolean vector)\BoolVector.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>

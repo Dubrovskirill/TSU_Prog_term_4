@@ -9,15 +9,21 @@ public:
 	HuffmanTree() = default;
 	~HuffmanTree() { clear(m_root); }
 
-	
+	void clear(Node* root);
+	void build(const std::string& text);
+
+	void printTable();
+	void printHorizontal() const;
+	void printHorizontal(Node* root, int marginLeft, int levelSpacing) const;
 
 private:
-
+	void createHuffmanTree();
 
 	
 private:
 	Node* m_root = nullptr;
 	std::vector<int> m_frequencyTable;
+	
 	struct DecodeData
 	{
 		int m_insignificantBits;
@@ -50,12 +56,11 @@ public:
 	Node* right()const;
 	void left(Node* left);
 	void right(Node* right);
-	bool operator<(const Node& other) const {
-		return frequency() > other.frequency();
-	}
-
+	bool operator!=(const Node* other) const { return symbols() != other->symbols();  }
+	
 
 private:
+	
 	Node* m_left = nullptr;
 	Node* m_right = nullptr;
 	int m_frequency = 1;

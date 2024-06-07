@@ -127,10 +127,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\TSU_Prog\OOP\OOP_LAB_3_(Сlass of boolean vector)\OOP_LAB_3_(Сlass of boolean vector)\BoolVector.h" />
     <ClInclude Include="HuffmanTree.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\TSU_Prog\OOP\OOP_LAB_3_(Сlass of boolean vector)\OOP_LAB_3_(Сlass of boolean vector)\BoolVector.cpp" />
     <ClCompile Include="HuffmanTree.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
