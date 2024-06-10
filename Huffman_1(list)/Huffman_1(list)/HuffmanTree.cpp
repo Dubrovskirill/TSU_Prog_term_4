@@ -116,23 +116,139 @@ void HuffmanTree::printHorizontal(Node* root, int marginLeft, int levelSpacing) 
 	printHorizontal(root->left(), marginLeft + levelSpacing, levelSpacing);
 }
 
+void prependDataToFile(const std::string& originFilename, const int data)
+{
+	std::ifstream inputFile(originFilename, std::ios::binary);
+	if (!inputFile.is_open()) {
+		std::cerr << "Failed to open file for reading:: " << originFilename << std::endl;
+		return;
+	}
+
+	std::string tempFileName = "temp_" + originFilename;
+	std::ofstream outputFile(tempFileName, std::ios::binary);
+	if (!outputFile.is_open()) {
+		std::cerr << "Failed to create a temporary file:" << tempFileName << std::endl;
+		return;
+	}
+
+	outputFile << data;
+	outputFile << inputFile.rdbuf();
+
+	outputFile.close();
+	inputFile.close();
+
+	if (std::remove(originFilename.c_str())) {
+		std::cerr << "Error delete: " << originFilename << std::endl;
+		return;
+	}
+
+	if (std::rename(tempFileName.c_str(), originFilename.c_str())) {
+		std::cerr << "Error rename: " << tempFileName << std::endl;
+		return;
+	}
+}
+
+float HuffmanTree::encode(const std::string& inputFilename, const std::string& outputFilename) {
+
+	if (!m_root) {
+		build(inputFilename); 
+	}
+
+	
+	std::ifstream inputFile(inputFilename, std::ios::binary);
+	if (!inputFile.is_open()) {
+		std::cerr << "ERROR open file for read: " << inputFilename << std::endl;
+		return -1;
+	}
 
 
+	std::ofstream outputFile(outputFilename, std::ios::binary);
+	if (!outputFile.is_open()) {
+		std::cerr << "ERROR open file for write: " << outputFilename << std::endl;
+		return -1;
+	}
+
+	unsigned char buffer = 0; 
+	int bitPos = 0; 
+
+	
+	size_t inputBytes = 0, outputBytes = 0;
+
+	char ch;
+	while (inputFile.get(ch)) { 
+		++inputBytes;
+
+		BoolVector code(256, 0); 
+		int codeLength = 0;
+
+		if (!encodeSymbol(ch, code, codeLength)) { 
+			std::cerr << "ERROR encoding" << std::endl;
+			return 0;
+		}
+
+		for (int i = 0; i < codeLength; ++i) {
+			if (code[i]) { 
+				buffer |= (1 << (7 - bitPos)); 
+			}
+			++bitPos;
+
+			if (bitPos == 8) { 
+				outputFile.put(buffer); 
+				++outputBytes;
+				buffer = 0; 
+				bitPos = 0; 
+			}
+		}
+	}
+
+	
+	if (bitPos > 0) {
+		outputFile.put(buffer);
+		++outputBytes;
+	}
+
+	inputFile.close(); 
+	outputFile.close();
 
 
+	prependDataToFile(outputFilename, bitPos == 0 ? 0 : 8 - bitPos);
 
+	return (static_cast<float>(outputBytes) / static_cast<float>(inputBytes)) * 100;
 
+}
 
+bool HuffmanTree::encodeSymbol(const unsigned char symbol, BoolVector& code, int& pos){
+	Node* root = m_root;
+	if (!m_root->left() && !m_root->right())
+	{
+		code[pos] = true;
+		++pos;
+		return true;
+	}
 
+	while (root->left() || root->right())
+	{
+		if (root->left()->symbols()[symbol] == true)
+		{
+			root = root->left();
+			code[pos] = true;
+			++pos;
+		}
+		else if (root->right()->symbols()[symbol] == true)
+		{
+			root = root->right();
+			code[pos] = false;
+			++pos;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	return true;
 
-
-
-
-
-
-
-
-
+	
+}
 
 
 HuffmanTree::Node::Node(const BoolVector& symbols, const int frequency, Node* left, Node* right)

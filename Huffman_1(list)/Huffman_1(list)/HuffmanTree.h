@@ -11,13 +11,17 @@ public:
 
 	void clear(Node* root);
 	void build(const std::string& text);
+	float encode(const std::string& inputFilename, const std::string& outputFilename);
+
+	
+
+	bool decode(const std::string& encodedFilename, const std::string& decodedFilename);
 
 	void printTable();
 	void printHorizontal() const;
 	void printHorizontal(Node* root, int marginLeft, int levelSpacing) const;
 
-private:
-	void createHuffmanTree();
+
 
 	
 private:
@@ -41,6 +45,11 @@ private:
 
 		}
 	};
+
+private:
+	void createHuffmanTree();
+	bool encodeSymbol(const unsigned char symbol, BoolVector& code, int& pos);
+	bool decodeSymbol(std::ofstream& ostream, DecodeData& data);
 
 };
 
