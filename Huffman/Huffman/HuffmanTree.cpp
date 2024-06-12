@@ -205,78 +205,65 @@ void prependDataToFile(const std::string& originFilename, const int data)
 	}
 }
 
-float HuffmanTree::encode(const std::string& inputFilename, const std::string& outputFilename)
-{
-	if (!m_root)
+
+
+float HuffmanTree::encode(const std::string& inputFilename, const std::string& outputFilename) {
+	if (!m_root) {
 		build(inputFilename);
+	}
 
 	std::ifstream inputFile(inputFilename, std::ios::binary);
-	if (!inputFile.is_open())
-	{
-		std::cerr << "Failed to open file for reading: " << inputFilename << std::endl;
+	if (!inputFile.is_open()) {
+		std::cerr << "Failed to open input file: " << inputFilename << std::endl;
 		return -1;
 	}
 
 	std::ofstream outputFile(outputFilename, std::ios::binary);
-	if (!outputFile.is_open())
-	{
-		std::cerr << "Failed to open file for writing: " << outputFilename << std::endl;
+	if (!outputFile.is_open()) {
+		std::cerr << "Failed to open output file: " << outputFilename << std::endl;
 		return -1;
 	}
 
 	unsigned char ch;
 	BoolVector code(256, 0);
 	int pos = 0;
-	int countCharInput = 0, countCharOutput = 0;
-	inputFile >> std::noskipws;
-	inputFile >> ch;
-	++countCharInput;
-	while (!inputFile.eof())
-	{
-		if (!encodeSymbol(ch, code, pos))
-		{
-			std::cerr << "Encoding failed: the function is called by another tree" << std::endl;
+	int countCharInput = 0;
+	int countCharOut = 0;
+
+	const unsigned char* symb;
+	while (!inputFile.eof()) {
+		if (!encodeSymbol(ch, code, pos)) {
+			std::cerr << "The function is called by another tree. Encoding is impossible or incorrect" << std::endl;
 			return 0;
 		}
 
-		const unsigned char* symbPtr = code.Data();
-		int i = 0;
-		for (; i < (pos / 8); ++i)
-		{
-			outputFile << symbPtr[i];
-			++countCharOutput;
-		}
-		if (pos / 8)
-		{
-			code = code << i * 8;
-			pos = pos % 8;
-		}
+		symb = code.Data();
+		int bytesToWrite = pos / 8;
+		outputFile.write(reinterpret_cast<const char*>(symb), bytesToWrite);
+		countCharOut += bytesToWrite;
 
+		code = code << (bytesToWrite * 8);
+		pos %= 8;
 		inputFile >> ch;
 		++countCharInput;
-		if (inputFile.eof() && (pos % 8))
-		{
-			outputFile << symbPtr[0];
-			++countCharOutput;
-		}
 	}
-	--countCharInput;
+
+	if (pos) {
+		outputFile << symb[0];
+		++countCharOut;
+	}
+
 	inputFile.close();
 	outputFile.close();
 
-	if (pos == 0)
-	{
-		prependDataToFile(outputFilename, 0);
-	}
-	else
-	{
-		prependDataToFile(outputFilename, 8 - pos);
-	}
+	prependDataToFile(outputFilename, pos ? 8 - pos : 0);
 
-	return ((static_cast<float>(countCharOutput) / static_cast<float>(countCharInput)) * 100);
+	
+	--countCharInput;
+
+	float compressionRatio = static_cast<float>(countCharOut) / countCharInput * 100;
+	return static_cast<int>(compressionRatio);
 }
-
-
 
 bool HuffmanTree::encodeSymbol(const unsigned char symbol, BoolVector& code, int& pos)
 {
@@ -392,20 +379,7 @@ bool HuffmanTree::decode(const std::string& encodedFilename, const std::string& 
 	return true;
 }
 
-int HuffmanTree::encodedFileSize(const std::string& filename)
-{
-	std::ifstream inputFile(filename, std::ios::binary);
-	if (!inputFile.is_open())
-	{
-		std::cerr << "Failed to open file for reading: " << filename << std::endl;
-		return -1;
-	}
 
-	inputFile.seekg(0, std::ios::end);
-	int fileSize = inputFile.tellg();
-	inputFile.close();
-	return fileSize;
-}
 
 
 
