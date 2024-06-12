@@ -248,22 +248,22 @@ bool HuffmanTree::encodeSymbol(const unsigned char symbol, BoolVector& code, int
 		}
 	}
 	return true;
-
-	
 }
+
+
 
 bool HuffmanTree::decode(const std::string& encodedFilename, std::string& decodedFilename)
 {
 	std::ifstream encodeFile(encodedFilename, std::ios::binary);
 	if (!encodeFile.is_open())
 	{
-		std::cerr << "Can't open file for read: " << encodedFilename << std::endl;
+		std::cerr << "ERROR open file for read: " << encodedFilename << std::endl;
 		return false;
 	}
 	std::ofstream decodeFile(decodedFilename, std::ios::binary);
 	if (!decodeFile.is_open())
 	{
-		std::cerr << "Can't open file for write: " << decodedFilename << std::endl;
+		std::cerr << "ERROR open file for write: " << decodedFilename << std::endl;
 		return false;
 	}
 	encodeFile >> std::noskipws;
@@ -275,7 +275,7 @@ bool HuffmanTree::decode(const std::string& encodedFilename, std::string& decode
 	data.m_path.addSymbol(ch, 0);
 	data.m_insignificantBits = insignificantBits - '0';
 	data.m_node = m_root;
-	int countChar = 1;
+	
 	if (encodeFile.peek() == EOF)
 	{
 		data.m_flagEOF = true;
@@ -383,6 +383,8 @@ bool HuffmanTree::decodeSymbol(std::ofstream& ostream, DecodeData& data)
 	return false;
 }
 
+
+
 HuffmanTree::Node::Node(const BoolVector& symbols, const int frequency, Node* left, Node* right)
 	: m_symbols(symbols)
 	, m_frequency(frequency)
@@ -426,6 +428,36 @@ bool HuffmanTree::Node::isLeaf() const {
 }
 
 
+void HuffmanTree::exportTree(const std::string& filename)
+{
+	if (!m_root)
+	{
+		std::cerr << "Tree is empty. Can't export" << std::endl;
+		return;
+	}
+	std::ofstream file(filename);
+	for (int i = 0; i < m_frequencyTable.size(); ++i)
+	{
+		file << m_frequencyTable[i] << " ";
+	}
+	file.close();
+}
 
+void HuffmanTree::importTree(const std::string& filename)
+{
+	if (m_root)
+	{
+		clear(m_root);
+	}
+	std::ifstream file(filename);
+	int frequency;
+	file >> frequency;
+	for (int i = 0; i < 256; ++i)
+	{
+		m_frequencyTable[i] = frequency;
+		file >> frequency;
+	}
+	createHuffmanTree();
+}
 
 

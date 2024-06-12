@@ -14,14 +14,12 @@ public:
 	float encode(const std::string& inputFilename, const std::string& outputFilename);
 	bool decode(const std::string& encodedFilename,  std::string& decodedFilename);
 
-	
-	
 	void printTable();
 	void printHorizontal() const;
 	void printHorizontal(Node* root, int marginLeft, int levelSpacing) const;
 
-
-
+	void exportTree(const std::string& filename);
+	void importTree(const std::string& filename);
 	
 private:
 	Node* m_root = nullptr;
@@ -49,7 +47,6 @@ private:
 	void createHuffmanTree();
 	bool encodeSymbol(const unsigned char symbol, BoolVector& code, int& pos);
 	bool decodeSymbol(std::ofstream& ostream, DecodeData& data);
-	//int findDecodedSymbol(Node* node, unsigned char& ch);
 	
 
 };
