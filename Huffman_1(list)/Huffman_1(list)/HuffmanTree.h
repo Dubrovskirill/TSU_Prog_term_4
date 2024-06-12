@@ -12,11 +12,10 @@ public:
 	void clear(Node* root);
 	void build(const std::string& text);
 	float encode(const std::string& inputFilename, const std::string& outputFilename);
+	bool decode(const std::string& encodedFilename,  std::string& decodedFilename);
 
 	
-
-	bool decode(const std::string& encodedFilename, const std::string& decodedFilename);
-
+	
 	void printTable();
 	void printHorizontal() const;
 	void printHorizontal(Node* root, int marginLeft, int levelSpacing) const;
@@ -50,6 +49,8 @@ private:
 	void createHuffmanTree();
 	bool encodeSymbol(const unsigned char symbol, BoolVector& code, int& pos);
 	bool decodeSymbol(std::ofstream& ostream, DecodeData& data);
+	//int findDecodedSymbol(Node* node, unsigned char& ch);
+	
 
 };
 
@@ -66,7 +67,7 @@ public:
 	void left(Node* left);
 	void right(Node* right);
 	bool operator!=(const Node* other) const { return symbols() != other->symbols();  }
-	
+	bool isLeaf() const;
 
 private:
 	

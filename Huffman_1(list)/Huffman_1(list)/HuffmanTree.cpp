@@ -1,6 +1,7 @@
 #include <fstream>
 #include <list>
 #include <string>
+#include <queue>
 #include "HuffmanTree.h"
 
 void HuffmanTree::clear(Node* root) {
@@ -213,6 +214,7 @@ float HuffmanTree::encode(const std::string& inputFilename, const std::string& o
 
 	prependDataToFile(outputFilename, bitPos == 0 ? 0 : 8 - bitPos);
 
+	
 	return (static_cast<float>(outputBytes) / static_cast<float>(inputBytes)) * 100;
 
 }
@@ -231,13 +233,13 @@ bool HuffmanTree::encodeSymbol(const unsigned char symbol, BoolVector& code, int
 		if (root->left()->symbols()[symbol] == true)
 		{
 			root = root->left();
-			code[pos] = true;
+			code[pos] = false;
 			++pos;
 		}
 		else if (root->right()->symbols()[symbol] == true)
 		{
 			root = root->right();
-			code[pos] = false;
+			code[pos] = true;
 			++pos;
 		}
 		else
@@ -250,6 +252,136 @@ bool HuffmanTree::encodeSymbol(const unsigned char symbol, BoolVector& code, int
 	
 }
 
+bool HuffmanTree::decode(const std::string& encodedFilename, std::string& decodedFilename)
+{
+	std::ifstream encodeFile(encodedFilename, std::ios::binary);
+	if (!encodeFile.is_open())
+	{
+		std::cerr << "Can't open file for read: " << encodedFilename << std::endl;
+		return false;
+	}
+	std::ofstream decodeFile(decodedFilename, std::ios::binary);
+	if (!decodeFile.is_open())
+	{
+		std::cerr << "Can't open file for write: " << decodedFilename << std::endl;
+		return false;
+	}
+	encodeFile >> std::noskipws;
+	unsigned char insignificantBits;
+	encodeFile >> insignificantBits;
+	unsigned char ch;
+	encodeFile >> ch;
+	DecodeData data;
+	data.m_path.addSymbol(ch, 0);
+	data.m_insignificantBits = insignificantBits - '0';
+	data.m_node = m_root;
+	int countChar = 1;
+	if (encodeFile.peek() == EOF)
+	{
+		data.m_flagEOF = true;
+		while (data.m_pos != 8 - data.m_insignificantBits)
+		{
+			decodeSymbol(decodeFile, data);
+		}
+	}
+	while (!encodeFile.eof())
+	{
+		bool isDecode = decodeSymbol(decodeFile, data);
+		if ((isDecode && (data.m_pos == 8)) || !isDecode)
+		{
+			encodeFile >> ch;
+			data.m_path.addSymbol(ch, 0);
+			data.m_pos = 0;
+			if (encodeFile.peek() == EOF)
+			{
+				data.m_flagEOF = true;
+				for (;;)
+				{
+					if (!decodeSymbol(decodeFile, data))
+					{
+						encodeFile.close();
+						decodeFile.close();
+						std::cerr << "Can't decode!" << std::endl;
+						return false;
+					}
+					if (data.m_pos == 8 - data.m_insignificantBits)
+						break;
+				}
+			}
+		}
+	}
+	encodeFile.close();
+	decodeFile.close();
+	return true;
+}
+
+bool HuffmanTree::decodeSymbol(std::ofstream& ostream, DecodeData& data)
+{
+	unsigned char ch;
+	int insignificantBits = 0;
+	if (data.m_flagEOF)
+	{
+		insignificantBits = data.m_insignificantBits;
+	}
+	if (!m_root->left() && !m_root->right())
+	{
+		for (int i = 0; i < 256; ++i)
+		{
+			if (m_root->symbols()[i] == true)
+			{
+				ch = static_cast<unsigned char>(i);
+				break;
+			}
+		}
+		for (; data.m_pos < 8 - insignificantBits; ++data.m_pos)
+		{
+			ostream << ch;
+		}
+		return true;
+	}
+	for (; data.m_pos < 8 - insignificantBits; ++data.m_pos)
+	{
+		if (data.m_path[data.m_pos] == false)
+		{
+			data.m_node = data.m_node->left();
+			if (!data.m_node->left() && !data.m_node->right())
+			{
+				for (int j = 0; j < 256; j++)
+				{
+					if (data.m_node->symbols()[j] == true)
+					{
+						ch = static_cast<unsigned char>(j);
+						break;
+					}
+				}
+				ostream << ch;
+				data.m_node = m_root;
+				++data.m_pos;
+				return true;
+			}
+		}
+		else
+		{
+			data.m_node = data.m_node->right();
+			if (!data.m_node->left() && !data.m_node->right())
+			{
+				for (int j = 0; j < 256; j++)
+				{
+					if (data.m_node->symbols()[j] == true)
+					{
+						ch = static_cast<unsigned char>(j);
+						break;
+					}
+				}
+				ostream << ch;
+				data.m_node = m_root;
+				++data.m_pos;
+				return true;
+			}
+		}
+	}
+	return false;
+}
 
 HuffmanTree::Node::Node(const BoolVector& symbols, const int frequency, Node* left, Node* right)
 	: m_symbols(symbols)
@@ -287,3 +419,13 @@ void HuffmanTree::Node::right(Node* right)
 {
 	m_right = right;
 }
+
+bool HuffmanTree::Node::isLeaf() const {
+	
+   return left() == nullptr && right() == nullptr;
+}
+
+
+
+
+
