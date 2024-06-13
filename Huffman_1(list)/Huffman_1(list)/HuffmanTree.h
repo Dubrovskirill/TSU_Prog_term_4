@@ -47,7 +47,6 @@ private:
 	void createHuffmanTree();
 	bool encodeSymbol(const unsigned char symbol, BoolVector& code, int& pos);
 	bool decodeSymbol(std::ofstream& ostream, DecodeData& data);
-	
 
 };
 

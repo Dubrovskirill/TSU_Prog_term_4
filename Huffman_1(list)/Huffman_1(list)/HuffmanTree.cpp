@@ -251,7 +251,6 @@ bool HuffmanTree::encodeSymbol(const unsigned char symbol, BoolVector& code, int
 }
 
 
-
 bool HuffmanTree::decode(const std::string& encodedFilename, std::string& decodedFilename)
 {
 	std::ifstream encodeFile(encodedFilename, std::ios::binary);
@@ -295,7 +294,7 @@ bool HuffmanTree::decode(const std::string& encodedFilename, std::string& decode
 			if (encodeFile.peek() == EOF)
 			{
 				data.m_flagEOF = true;
-				for (;;)
+				while(true)
 				{
 					if (!decodeSymbol(decodeFile, data))
 					{
@@ -382,8 +381,6 @@ bool HuffmanTree::decodeSymbol(std::ofstream& ostream, DecodeData& data)
 	}
 	return false;
 }
-
-
 
 HuffmanTree::Node::Node(const BoolVector& symbols, const int frequency, Node* left, Node* right)
 	: m_symbols(symbols)
