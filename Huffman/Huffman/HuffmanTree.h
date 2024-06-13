@@ -11,6 +11,7 @@ public:
 
 	void clear(Node* root);
 	void build(const std::string& text);
+	void printHorizontal() const;
 
 private:
 
@@ -18,12 +19,10 @@ private:
 	float encode(const std::string& inputFilename, const std::string& outputFilename);
 	bool decode(const std::string& encodedFilename, const std::string& decodedFilename);
 
-	void printHorizontal() const;
+	
 	void printHorizontal(Node* root, int marginLeft, int levelSpacing) const;
 
-	void printSim(const BoolVector& vec1);
-
-	static bool comparisonAlphafit( const BoolVector& vec1,  const BoolVector& vec2);
+	
 private:
 	Node* m_root = nullptr;
 	std::vector<int> m_frequencyTable;
