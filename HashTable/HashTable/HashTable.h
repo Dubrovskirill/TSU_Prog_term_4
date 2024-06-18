@@ -39,8 +39,8 @@ public:
 
     int hash(const int key, const int m_tableSize) const override {
         double a = (1 - std::sqrt(5)) / 2;
-        int h = key % m_tableSize;
-        return static_cast<int>(std::floor(h * a * m_tableSize)) % m_tableSize;
+        
+        return static_cast<int>(std::abs(key * a)) % m_tableSize;
     }
 
     HashFunction* clone() const override {
@@ -211,21 +211,12 @@ T& HashTable<T>::operator[](int key) {
 
 template <typename T>
 void HashTable<T>::setHashFunction(HashFunction* newHashFunction) {
-    
-    auto oldTable = m_table;
-    int oldSize = m_tableSize;
-
-    
-    delete m_hashFunction;  
-    m_hashFunction = newHashFunction->clone();
-    m_table.clear();
-    m_tableSize = oldSize;  
-    m_table.resize(m_tableSize); 
-
-    
-    for (const auto& list : oldTable) {
-        for (const auto& node : list) {
-            insert(node.m_key, node.m_value);
-        }
+    if (!newHashFunction || m_hashFunction == newHashFunction) {
+        return; 
     }
+
+  
+    delete m_hashFunction;
+    m_hashFunction = newHashFunction->clone();
+    resize(m_tableSize);
 }

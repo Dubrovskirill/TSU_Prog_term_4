@@ -9,10 +9,10 @@ int main()
     SecondHashFunction* hash2 = new SecondHashFunction;
     ThirdHashFunction* hash3 = new ThirdHashFunction;
 
-    HashTable<std::string> hashTable(hash3,10);
+    HashTable<std::string> hashTable(hash2,10);
 
-    HashTable<std::string> hashTable2(hash3, 20);
-    hashTable.insert(4, "apple");
+    HashTable<std::string> hashTable2(hash2, 20);
+    hashTable.insert(15, "apple");
     hashTable.insert(20, "banana");
     hashTable.insert(30, "cherry");
     hashTable.insert(20, "grape"); // Попробуем вставить дубликат по ключу 20
@@ -68,7 +68,7 @@ int main()
     hashTable.print();
 
     // Замена хеш-функции
-    hashTable.setHashFunction(hash2);
+    hashTable.setHashFunction(hash3);
     std::cout << "\nHashTable after changing hash function:" << std::endl;
     hashTable.print();
 
