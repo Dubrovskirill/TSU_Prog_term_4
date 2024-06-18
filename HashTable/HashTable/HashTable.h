@@ -72,7 +72,7 @@ private:
     struct Node {
         int m_key;
         T m_value;
-        Node* m_next;
+       
         Node(int key, const T& value) : m_key(key), m_value(value) {}
     };
 
@@ -86,11 +86,10 @@ public:
     HashTable(HashFunction* hashFunc, int size);
     ~HashTable();
 
- 
-    void resize(int newSize);
-    void clear();
     void print() const;
     void insert(int key, const T& value);
+    void resize(int newSize);
+    void clear();
 
     bool contains(const int key) const;
     HashTable& operator=(const HashTable& other);
@@ -98,147 +97,80 @@ public:
 
 
 
-template<typename T>
-HashTable<T>::HashTable() 
-    : HashTable(new FirstHashFunction, 10)
-{}
-
-
-template<typename T>
-HashTable<T>::HashTable(const HashTable& other) : m_tableSize(other.m_tableSize), m_hashFunction(nullptr) {
-  
-    if (other.m_hashFunction) {
-        m_hashFunction = other.m_hashFunction->clone();
-    }
-
-   
-    m_table.clear();
-    m_table.resize(m_tableSize);
-    for (int i = 0; i < m_tableSize; ++i) {
-        Node* current = other.m_table[i];
-        while (current) {
-            insert(current->key, current->value);
-            current = current->next;
-        }
-    }
-}
+template <typename T>
+HashTable<T>::HashTable() : m_tableSize(10), m_table(10), m_hashFunction(new FirstHashFunction()) {}
 
 template <typename T>
-HashTable<T>::HashTable(HashFunction* hashFunc, int size) :
-    m_tableSize(size), m_hashFunction(hashFunc)
-{
-    m_table.clear(); 
-    m_table.resize(m_tableSize);
-}
+HashTable<T>::HashTable(const HashTable& other) : m_tableSize(other.m_tableSize), m_table(other.m_table), m_hashFunction(other.m_hashFunction->clone()) {}
 
-template<typename T>
+template <typename T>
+HashTable<T>::HashTable(HashFunction* hashFunc, int size) : m_tableSize(size), m_table(size), m_hashFunction(hashFunc->clone()) {}
+
+template <typename T>
 HashTable<T>::~HashTable() {
-    clear(); 
     delete m_hashFunction;
-}
-
-template <typename T>
-void HashTable<T>::resize(int newSize) {
-    std::vector<std::list<Node>> newTable(newSize);
-
-    for (int i = 0; i < m_tableSize; ++i) {
-        for (auto it = m_table[i].begin(); it != m_table[i].end(); ) {
-            int newIndex = m_hashFunction->hash(it->m_key, newSize);
-           
-            newTable[newIndex].splice(newTable[newIndex].end(), m_table[i], it++);
-        }
-    }
-
-    m_tableSize = newSize;
-    m_table = std::move(newTable);
-}
-
-template <typename T>
-void HashTable<T>::clear() {
-    for (int i = 0; i < m_tableSize; ++i) {
-        
-        for (auto it = m_table[i].begin(); it != m_table[i].end(); ++it) {
-            delete& (*it); 
-        }
-
-        m_table[i].clear();  
-    }
-}
-
-template <typename T>
-HashTable<T>& HashTable<T>::operator=(const HashTable& other) {
-    if (this == &other) { 
-        return *this;
-    }
-
-    clear(); 
-    delete m_hashFunction; 
-
-    m_tableSize = other.m_tableSize; 
-
-    
-    if (other.m_hashFunction != nullptr) {
-        m_hashFunction = other.m_hashFunction->clone();
-    }
-    else {
-        m_hashFunction = nullptr;
-    }
-
-    m_table.resize(m_tableSize); 
-
-   
-    for (int i = 0; i < m_tableSize; ++i) {
-        Node* current = other.m_table[i];
-        while (current != nullptr) {
-            insert(current->key, current->value); 
-            current = current->next;
-        }
-    }
-
-    return *this; 
 }
 
 template <typename T>
 void HashTable<T>::print() const {
     for (int i = 0; i < m_tableSize; ++i) {
-        std::cout << "Index " << i << ": ";
-
-        
-        for (const Node& node : m_table[i]) {
+        std::cout << i << ": ";
+        for (const auto& node : m_table[i]) {
             std::cout << "(" << node.m_key << ", " << node.m_value << ") ";
         }
-
         std::cout << std::endl;
     }
 }
 
 template <typename T>
 void HashTable<T>::insert(int key, const T& value) {
-    int index = m_hashFunction->hash(key, m_tableSize); 
-
-   
-    for (Node& node : m_table[index]) {
-        if (node.m_key == key) {
-            node.m_value = value; 
-            return;
-        }
+    if (contains(key)) {
+        std::cerr << "Error: Key " << key << " already exists in the table." << std::endl;
+        return;
     }
 
-    
+    int index = m_hashFunction->hash(key, m_tableSize);
     m_table[index].push_back(Node(key, value));
 }
 
-
 template <typename T>
 bool HashTable<T>::contains(const int key) const {
-    int index = m_hashFunction->hash(key, m_tableSize); 
-
-   
-    for (const Node& node : m_table[index]) {
-        if (node.m_key == key) { 
-            return true; 
+    int index = m_hashFunction->hash(key, m_tableSize);
+    for (const auto& node : m_table[index]) {
+        if (node.m_key == key) {
+            return true;
         }
     }
+    return false;
+}
 
-    return false; 
+template <typename T>
+void HashTable<T>::resize(int newSize) {
+    std::vector<std::list<Node>> newTable(newSize);
+    for (const auto& list : m_table) {
+        for (const auto& node : list) {
+            int index = m_hashFunction->hash(node.m_key, newSize);
+            newTable[index].push_back(node);
+        }
+    }
+    m_table = std::move(newTable);
+    m_tableSize = newSize;
+}
+
+template <typename T>
+void HashTable<T>::clear() {
+    for (auto& list : m_table) {
+        list.clear();
+    }
+}
+
+template <typename T>
+HashTable<T>& HashTable<T>::operator=(const HashTable& other) {
+    if (this != &other) {
+        delete m_hashFunction;
+        m_tableSize = other.m_tableSize;
+        m_table = other.m_table;
+        m_hashFunction = other.m_hashFunction->clone();
+    }
+    return *this;
 }

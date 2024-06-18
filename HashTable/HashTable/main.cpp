@@ -12,9 +12,9 @@ int main()
     HashTable<std::string> hashTable;
    
     HashTable<std::string> hashTable2(hash3,20);
-    hashTable.insert(1, "apple");
+    hashTable.insert(4, "apple");
     hashTable.insert(20, "banana");
-    hashTable.insert(3, "cherry");
+    hashTable.insert(30, "cherry");
     hashTable.insert(20, "grape"); // Попробуем вставить дубликат по ключу 20
   
    
@@ -35,10 +35,10 @@ int main()
     std::cout << "\nHashTable after resizing to 20:" << std::endl;
     hashTable.print();
 
-    //// Очищаем таблицу
-    //hashTable.clear();
-    //std::cout << "\nHashTable after clearing:" << std::endl;
-    //hashTable.print();
+    // Очищаем таблицу
+    hashTable.clear();
+    std::cout << "\nHashTable after clearing:" << std::endl;
+    hashTable.print();
 
     return 0;
 
