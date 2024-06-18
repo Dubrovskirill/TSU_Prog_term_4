@@ -90,9 +90,13 @@ public:
     void insert(int key, const T& value);
     void resize(int newSize);
     void clear();
+    void setHashFunction(HashFunction* newHashFunction);
 
     bool contains(const int key) const;
+    bool erase(int key);
+
     HashTable& operator=(const HashTable& other);
+    T& operator[](int key);
 };
 
 
@@ -173,4 +177,55 @@ HashTable<T>& HashTable<T>::operator=(const HashTable& other) {
         m_hashFunction = other.m_hashFunction->clone();
     }
     return *this;
+}
+
+template <typename T>
+bool HashTable<T>::erase(int key) {
+    int index = m_hashFunction->hash(key, m_tableSize);
+
+    for (auto it = m_table[index].begin(); it != m_table[index].end(); ++it) {
+        if (it->m_key == key) {
+            m_table[index].erase(it);
+            return true;
+        }
+    }
+    return false;
+}
+
+template <typename T>
+T& HashTable<T>::operator[](int key) {
+    int index = m_hashFunction->hash(key, m_tableSize);
+
+    for (auto& node : m_table[index]) {
+        if (node.m_key == key) {
+            return node.m_value;
+        }
+    }
+
+    
+    insert(key, T{});
+
+
+    return m_table[index].back().m_value;
+}
+
+template <typename T>
+void HashTable<T>::setHashFunction(HashFunction* newHashFunction) {
+    
+    auto oldTable = m_table;
+    int oldSize = m_tableSize;
+
+    
+    delete m_hashFunction;  
+    m_hashFunction = newHashFunction->clone();
+    m_table.clear();
+    m_tableSize = oldSize;  
+    m_table.resize(m_tableSize); 
+
+    
+    for (const auto& list : oldTable) {
+        for (const auto& node : list) {
+            insert(node.m_key, node.m_value);
+        }
+    }
 }
