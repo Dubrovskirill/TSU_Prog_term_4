@@ -5,7 +5,7 @@
 #include <cmath>
 #include <algorithm>
 #include <list>
-
+#include <assert.h>
 // interface of the hash function
 class HashFunction {
 public:
@@ -193,6 +193,7 @@ bool HashTable<T>::erase(int key) {
 }
 
 template <typename T>
+
 T& HashTable<T>::operator[](int key) {
     int index = m_hashFunction->hash(key, m_tableSize);
 
@@ -202,11 +203,11 @@ T& HashTable<T>::operator[](int key) {
         }
     }
 
+   
+    assert(false && "Key not found in hash table");
+
     
-    insert(key, T{});
-
-
-    return m_table[index].back().m_value;
+    return m_table[index].back().m_value; 
 }
 
 template <typename T>
