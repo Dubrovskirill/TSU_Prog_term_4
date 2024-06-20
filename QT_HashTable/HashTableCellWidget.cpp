@@ -10,6 +10,7 @@ HashTableCellWidget::HashTableCellWidget(QWidget *parent) :
     connect(ui->lineEdit_value, &QLineEdit::editingFinished, this, [this]() {
         emit valueChanged(this);
     });
+    setFixedSize(QSize(250, 40));
 }
 
 HashTableCellWidget::~HashTableCellWidget()

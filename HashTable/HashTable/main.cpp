@@ -10,6 +10,8 @@ int main() {
     HashTable<std::string> foo(&third, 10);
     foo.print();
     foo.insert(1, "1");
+    foo.insert(1, "2");
+    foo.insert(1, "3");
     foo.insert(21, "1");
     foo.insert(31, "1");
     foo.insert(41, "1");

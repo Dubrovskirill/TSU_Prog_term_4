@@ -17,6 +17,7 @@ class HashTableWidget : public QWidget
 
 public:
     explicit HashTableWidget(QWidget *parent = nullptr);
+
     ~HashTableWidget();
 
     int findRow(int key) const;
@@ -26,10 +27,11 @@ public slots:
     bool removeRow(int key);
     void resize(int size);
     void clear();
+    void resetHighlight() const;
 
 protected:
     void paintEvent(QPaintEvent *event) override;
-    void resetHighlight();
+
 private:
     struct NodeWidget {
         HashTableCellWidget *widget = nullptr;
@@ -57,7 +59,8 @@ private:
     void removeNodeFromBucket(int bucketIndex, int key);
     const BucketWidget* findBucket(int key) const;
     void clearBucket(BucketWidget* bucket);
-    void drawArrow(QPainter& painter, int endX, int endY, int startX, int startY);
+    void drawArrow(QPainter& painter, const QPoint& start, const QPoint& end);
+    void resetHighlightInternal();
 
 private slots:
     void onValueChanged(HashTableCellWidget *item);
