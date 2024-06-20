@@ -6,6 +6,7 @@ HashTableCellWidget::HashTableCellWidget(QWidget *parent) :
     ui(new Ui::HashTableCellWidget)
 {
     ui->setupUi(this);
+    ui->lineEdit_value->setReadOnly(true);
     connect(ui->lineEdit_value, &QLineEdit::editingFinished, this, [this]() {
         emit valueChanged(this);
     });
@@ -34,4 +35,9 @@ void HashTableCellWidget::setKey(int key)
 void HashTableCellWidget::setValue(const QString &value)
 {
     ui->lineEdit_value->setText(value);
+}
+
+void HashTableCellWidget::emptyKey()
+{
+    ui->label_keyValue->setText("");
 }

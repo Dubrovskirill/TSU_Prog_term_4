@@ -2,7 +2,12 @@
 
 #include <QWidget>
 #include <QVector>
-
+#include <QGridLayout>
+#include <QPainter>
+#include <QPaintEvent>
+#include <QDebug>
+#include <QLabel>
+#include "../HashTable/HashTable/HashTable.h"
 class QGridLayout;
 class HashTableCellWidget;
 
@@ -20,31 +25,57 @@ public slots:
     void addRow(int key, const QString &value);
     bool removeRow(int key);
     void resize(int size);
+    void clear();
 
 protected:
     void paintEvent(QPaintEvent *event) override;
-
-private slots:
-    void addConnection(int from, int to);
-    void removeConnections(int itemIndex);
-    void onValueChanged(HashTableCellWidget *item);
-
+    void resetHighlight();
 private:
-    struct ItemData
-    {
-        HashTableCellWidget *ptr = nullptr;
-        HashTableCellWidget *prev = nullptr;
-        HashTableCellWidget *next = nullptr;
+    struct NodeWidget {
+        HashTableCellWidget *widget = nullptr;
+        NodeWidget *next = nullptr;
 
-        QRect connectionRect;
-        QRect baseConnectionRect(int connectionOffset) const;
-        static QRect baseConnectionRect(HashTableCellWidget *from, HashTableCellWidget *to, int connectionOffset);
+        NodeWidget(HashTableCellWidget* w) : widget(w) {}
     };
 
-    QVector<ItemData> m_items;
+    struct BucketWidget {
+        QLabel *indexLabel = nullptr;
+        NodeWidget *head = nullptr;
+
+        ~BucketWidget() {
+            NodeWidget *current = head;
+            while (current != nullptr) {
+                NodeWidget *next = current->next;
+                delete current->widget;
+                delete current;
+                current = next;
+            }
+        }
+    };
+
+    void addNodeToBucket(int bucketIndex, HashTableCellWidget* cell);
+    void removeNodeFromBucket(int bucketIndex, int key);
+    const BucketWidget* findBucket(int key) const;
+    void clearBucket(BucketWidget* bucket);
+    void drawArrow(QPainter& painter, int endX, int endY, int startX, int startY);
+
+private slots:
+    void onValueChanged(HashTableCellWidget *item);
+    void highlightCell(int bucketIndex, int key);
+    void addConnection(int from, int to);
+    void removeConnections(int itemIndex);
+
+
+
+private:
+    QVector<BucketWidget> m_buckets;
     QGridLayout *m_layout = nullptr;
-    int m_baseConnectionOffset = 10;
-    int m_connectionOffset = 5;
-    //TODO: HashTable m_table;
+    HashTable<QString> m_hashTable;
+    HashTableCellWidget* m_targetCell = nullptr;
+
+
+signals:
+    void cellFound(int bucketIndex, int key) const;
+
 };
 

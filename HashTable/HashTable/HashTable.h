@@ -80,6 +80,8 @@ private:
     std::vector<std::list<Node>> m_table;
     HashFunction* m_hashFunction;
 public:
+    friend class HashTableWidget;
+public:
 
     HashTable();
     HashTable(const HashTable& other);
@@ -97,6 +99,10 @@ public:
 
     HashTable& operator=(const HashTable& other);
     T& operator[](int key);
+
+    int capacity() const {
+        return m_tableSize;
+    }
 };
 
 
