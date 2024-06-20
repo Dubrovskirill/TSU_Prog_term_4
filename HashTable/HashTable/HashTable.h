@@ -29,8 +29,8 @@ public:
     }
 
 private:
-    const int c = 0;
-    const int d = 3;
+    const int c = 4%5;
+    const int d = 4%7;
 };
 
 class SecondHashFunction : public HashFunction {
@@ -216,7 +216,6 @@ void HashTable<T>::setHashFunction(HashFunction* newHashFunction) {
         return; 
     }
 
-  
     delete m_hashFunction;
     m_hashFunction = newHashFunction->clone();
     resize(m_tableSize);

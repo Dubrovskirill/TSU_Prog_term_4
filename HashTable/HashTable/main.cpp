@@ -3,8 +3,50 @@
 
 #include"HashTable.h"
 
-int main()
-{
+int main() {
+
+    FirstHashFunction first;
+    ThirdHashFunction third;
+    HashTable<std::string> foo(&third, 10);
+    foo.print();
+    foo.insert(1, "1");
+    foo.insert(21, "1");
+    foo.insert(31, "1");
+    foo.insert(41, "1");
+    foo.insert(61, "1");
+    foo.insert(16, "1");
+    foo.insert(12, "1");
+    foo.insert(211, "1");
+    foo.insert(111, "1");
+    foo.insert(1231, "1");
+    foo.insert(1241231, "1");
+    foo.insert(121231, "1");
+
+    foo.print();
+
+    foo.resize(200);
+    foo.print();
+
+    foo.setHashFunction(nullptr);
+    foo.print();
+
+    foo.setHashFunction(&first);
+    foo.print();
+
+    foo.resize(2);
+    foo.insert(323, "23");
+    foo.erase(11);
+    for (int i = 0; i < 200; ++i) {
+        foo.erase(i);
+    }
+
+
+    foo.resize(1);
+    foo.erase(1);
+    foo.insert(1, "1");
+    foo.print();
+
+    return -1;
     FirstHashFunction* hash1 = new FirstHashFunction;
     SecondHashFunction* hash2 = new SecondHashFunction;
     ThirdHashFunction* hash3 = new ThirdHashFunction;
@@ -61,7 +103,7 @@ int main()
     std::cout << "\nValue for key 15: " << hashTable[15] << std::endl;
 
     // Попытка доступа к несуществующему ключу (добавит новую запись)
-    std::cout << "\nValue for key 100: " << hashTable[100] << std::endl;
+    //std::cout << "\nValue for key 100: " << hashTable[100] << std::endl;
 
     // Выводим таблицу
     std::cout << "\nFinal HashTable:" << std::endl;
