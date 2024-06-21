@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->pushButton_setTableSize, &QPushButton::clicked, this, [this]() {
         ui->hashTable->resize(ui->spinBox_tableSize->value());
     });
-    int size = 50;
+    int size = 20;
     ui->hashTable->resize(size);
 //    ui->hashTable->addRow(42, QString::number(17));
 //    ui->hashTable->addRow(92, QString::number(24));

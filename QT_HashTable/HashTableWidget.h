@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include <QWidget>
@@ -61,6 +62,7 @@ private:
     void clearBucket(BucketWidget* bucket);
     void drawArrow(QPainter& painter, const QPoint& start, const QPoint& end);
     void resetHighlightInternal();
+    void clearLayout();
 
 private slots:
     void onValueChanged(HashTableCellWidget *item);
@@ -81,4 +83,3 @@ signals:
     void cellFound(int bucketIndex, int key) const;
 
 };
-

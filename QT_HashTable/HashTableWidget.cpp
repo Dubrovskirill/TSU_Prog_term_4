@@ -5,6 +5,7 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QPainterPath>
+#include <QSpacerItem>
 #include "HashTableCellWidget.h"
 
 #include "HashTableWidget.h"
@@ -19,6 +20,8 @@ HashTableWidget::HashTableWidget(QWidget *parent)
     connect(this, &HashTableWidget::cellFound, this, &HashTableWidget::highlightCell);
     m_layout->setColumnStretch(0, 0);
     m_layout->setColumnStretch(1, 1);
+    QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    m_layout->addItem(verticalSpacer, m_buckets.size(), 0, 1, 2);
 }
 
 HashTableWidget::~HashTableWidget()
@@ -43,41 +46,43 @@ void HashTableWidget::highlightCell(int bucketIndex, int key) {
     }
 }
 
-void HashTableWidget::resetHighlight() const {
-    for (int i = 0; i < m_buckets.size(); ++i) {
-        BucketWidget& bucket = const_cast<BucketWidget&>(m_buckets[i]); // Снимаем const
-        NodeWidget* current = bucket.head;
-        while (current != nullptr) {
-            current->widget->setStyleSheet("");
-            current = current->next;
-        }
-    }
-}
-
-
 
 int HashTableWidget::findRow(int key) const {
-
     int bucketIndex = m_hashTable.m_hashFunction->hash(key, m_hashTable.capacity());
-
 
     NodeWidget* current = m_buckets[bucketIndex].head;
     while (current != nullptr) {
         if (current->widget->key() == key) {
             resetHighlight();
+
+
+            current->widget->setStyleSheet("border: 2px solid red;");
+
             emit cellFound(bucketIndex, key);
             return bucketIndex;
         }
         current = current->next;
     }
 
-
     return -1;
+}
+
+
+void HashTableWidget::resetHighlight() const {
+    for (int i = 0; i < m_buckets.size(); ++i) {
+        BucketWidget& bucket = const_cast<BucketWidget&>(m_buckets[i]);
+        NodeWidget* current = bucket.head;
+        while (current != nullptr) {
+
+            current->widget->setStyleSheet("");
+            current = current->next;
+        }
+    }
 }
 
 void HashTableWidget::addRow(int key, const QString &value) {
 
-    resetHighlight();
+
     if (m_hashTable.contains(key)) {
 
         qDebug() << "Ошибка: Ключ" << key << "уже существует в таблице.";
@@ -119,7 +124,7 @@ void HashTableWidget::addRow(int key, const QString &value) {
 }
 
 bool HashTableWidget::removeRow(int key) {
-    resetHighlight();
+
     if (m_hashTable.erase(key)) {
         int bucketIndex = m_hashTable.m_hashFunction->hash(key, m_hashTable.capacity());
         removeNodeFromBucket(bucketIndex, key);
@@ -129,52 +134,80 @@ bool HashTableWidget::removeRow(int key) {
 }
 
 void HashTableWidget::resize(int newSize) {
-    resetHighlight();
+
     if (newSize <= 0) {
         return;
     }
 
-
+    // 1. Сохраняем данные из ячеек
     std::vector<std::pair<int, QString>> oldData;
-    for (int i = 0; i < m_hashTable.capacity(); ++i) {
-        for (const auto& node : m_hashTable.m_table[i]) {
-            oldData.push_back({node.m_key, node.m_value});
-        }
-    }
-
-
-    for (BucketWidget& bucket : m_buckets) {
-
+    for (const BucketWidget& bucket : m_buckets) {
         NodeWidget* current = bucket.head;
         while (current != nullptr) {
-            NodeWidget* next = current->next;
-            delete current->widget;
-            delete current;
-            current = next;
+            oldData.push_back({current->widget->key(), current->widget->value()});
+            current = current->next;
         }
-        bucket.head = nullptr;
     }
+
+    // 2. Очищаем layout и бакеты
+    clearLayout();
     m_buckets.clear();
 
-
+    // 3. Изменяем размер хэш-таблицы
     m_hashTable.resize(newSize);
 
-
+    // 4. Пересоздаем элементы layout
     m_buckets.resize(newSize);
     for (int i = 0; i < newSize; ++i) {
+        // Создаем метку для бакета
         m_buckets[i].indexLabel = new QLabel(QString::number(i) + ":", this);
         m_buckets[i].indexLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         m_layout->addWidget(m_buckets[i].indexLabel, i, 0, Qt::AlignRight);
-    }
+
+        // Создаем layout для ячеек в бакете
+        QHBoxLayout* rowLayout = new QHBoxLayout();
+        rowLayout->setSpacing(100);
+        rowLayout->setContentsMargins(0, 0, 0, 0);
+        m_layout->addLayout(rowLayout, i, 1, Qt::AlignLeft);
 
 
-    for (const auto& data : oldData) {
-        addRow(data.first, data.second);
+        for (const auto& data : oldData) {
+            int bucketIndex = m_hashTable.m_hashFunction->hash(data.first, m_hashTable.capacity());
+            if (bucketIndex == i) {
+                HashTableCellWidget* cell = new HashTableCellWidget(this);
+                cell->setKey(data.first);
+                cell->setValue(data.second);
+                connect(cell, &HashTableCellWidget::valueChanged, this, &HashTableWidget::onValueChanged);
+                rowLayout->addWidget(cell);
+                addNodeToBucket(bucketIndex, cell);
+            }
+        }
     }
 }
 
+
+void HashTableWidget::clearLayout() {
+    QLayoutItem* item;
+    while ((item = m_layout->takeAt(0)) != nullptr) {
+        delete item->widget();
+        delete item;
+    }
+}
+
+
+void HashTableWidget::clearBucket(BucketWidget* bucket) {
+    NodeWidget* current = bucket->head;
+    while (current != nullptr) {
+        NodeWidget* next = current->next;
+        delete current->widget;
+        delete current;
+        current = next;
+    }
+    bucket->head = nullptr;
+}
+
 void HashTableWidget::clear() {
-    resetHighlight();
+
 
     m_hashTable.clear();
 
@@ -201,6 +234,7 @@ void HashTableWidget::clear() {
     m_buckets.clear();
 }
 void HashTableWidget::paintEvent(QPaintEvent *event) {
+
     QWidget::paintEvent(event);
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
@@ -214,8 +248,6 @@ void HashTableWidget::paintEvent(QPaintEvent *event) {
         }
 
         while (current != nullptr && current->next != nullptr) {
-           // QWidget* currentWidget =
-          //  QWidget* nextWidget = t;
 
 
             QPoint currentPos = current->widget->pos();
@@ -248,10 +280,7 @@ void HashTableWidget::drawArrow(QPainter& painter, const QPoint& start, const QP
 
     painter.drawLine(start, end);
 
-
-
-
-     qreal angle = atan2(start.y() - end.y(), start.x() - end.x());
+    qreal angle = atan2(start.y() - end.y(), start.x() - end.x());
 
 
     int arrowSize = 10;
@@ -356,7 +385,7 @@ void HashTableWidget::addNodeToBucket(int bucketIndex, HashTableCellWidget* cell
         current = current->next;
     }
 
-    // Добавление нового узла в конец списка
+
     current->next = newNode;
 }
 
@@ -387,16 +416,6 @@ const HashTableWidget::BucketWidget* HashTableWidget::findBucket(int key) const 
     return &(m_buckets[bucketIndex]);
 }
 
-void HashTableWidget::clearBucket(BucketWidget* bucket) {
-    NodeWidget* current = bucket->head;
-    while (current != nullptr) {
-        NodeWidget* next = current->next;
-        delete current->widget;
-        delete current;
-        current = next;
-    }
-    bucket->head = nullptr;
-}
 
 
 
