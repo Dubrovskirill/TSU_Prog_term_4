@@ -20,8 +20,12 @@ HashTableWidget::HashTableWidget(QWidget *parent)
     connect(this, &HashTableWidget::cellFound, this, &HashTableWidget::highlightCell);
     m_layout->setColumnStretch(0, 0);
     m_layout->setColumnStretch(1, 1);
+    m_layout->setRowStretch(0, 0);
     QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
     m_layout->addItem(verticalSpacer, m_buckets.size(), 0, 1, 2);
+
+
+    m_layout->setRowStretch(1, 1);
 }
 
 HashTableWidget::~HashTableWidget()
@@ -119,7 +123,7 @@ void HashTableWidget::addRow(int key, const QString &value) {
 
     addNodeToBucket(bucketIndex, cell);
 
-
+    m_layout->setRowStretch(m_buckets.size() - 1, 0);
     update();
 }
 
