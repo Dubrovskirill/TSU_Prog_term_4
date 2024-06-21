@@ -21,14 +21,14 @@ public:
 
     ~HashTableWidget();
 
-    int findRow(int key) const;
+    int findRow(int key);
 
 public slots:
     void addRow(int key, const QString &value);
     bool removeRow(int key);
     void resize(int size);
     void clear();
-    void resetHighlight() const;
+    void resetHighlight() ;
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -63,6 +63,7 @@ private:
     void drawArrow(QPainter& painter, const QPoint& start, const QPoint& end);
     void resetHighlightInternal();
     void clearLayout();
+    void drawBorder(HashTableCellWidget* cell, const QColor& color);
 
 private slots:
     void onValueChanged(HashTableCellWidget *item);
@@ -77,6 +78,7 @@ private:
     QGridLayout *m_layout = nullptr;
     HashTable<QString> m_hashTable;
     HashTableCellWidget* m_targetCell = nullptr;
+    QColor m_borderColor = Qt::green;
 
 
 signals:
