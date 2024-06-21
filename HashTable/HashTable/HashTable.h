@@ -29,8 +29,8 @@ public:
     }
 
 private:
-    const int c = 4%5;
-    const int d = 4%7;
+    static constexpr int c = 4%5;
+    static constexpr int d = 4%7;
 };
 
 class SecondHashFunction : public HashFunction {
@@ -38,7 +38,7 @@ public:
     ~SecondHashFunction() override = default;
 
     int hash(const int key, const int m_tableSize) const override {
-        double a = (1 - std::sqrt(5)) / 2;
+        static double a = (1 - std::sqrt(5)) / 2;
         
         return static_cast<int>(std::abs(key * a)) % m_tableSize;
     }
@@ -143,6 +143,10 @@ void HashTable<T>::insert(int key, const T& value) {
     m_table[index].push_back(Node(key, value));
 }
 
+
+//template <typename T>
+//typename HashTable<T>::Node* find(const int key) const;
+
 template <typename T>
 bool HashTable<T>::contains(const int key) const {
     int index = m_hashFunction->hash(key, m_tableSize);
@@ -163,7 +167,7 @@ void HashTable<T>::resize(int newSize) {
             newTable[index].push_back(node);
         }
     }
-    m_table = std::move(newTable);
+    m_table.swap(newTable);
     m_tableSize = newSize;
 }
 

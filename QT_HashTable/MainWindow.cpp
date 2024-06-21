@@ -23,6 +23,9 @@ MainWindow::MainWindow(QWidget *parent) :
     });
     int size = 50;
     ui->hashTable->resize(size);
+//    ui->hashTable->addRow(42, QString::number(17));
+//    ui->hashTable->addRow(92, QString::number(24));
+//    ui->hashTable->addRow(52, QString::number(52));
 
     for (int i = 0; i < size; ++i) {
         ui->hashTable->addRow(rand() % 100, QString::number(i));

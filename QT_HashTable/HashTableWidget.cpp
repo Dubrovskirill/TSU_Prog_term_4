@@ -17,7 +17,6 @@ HashTableWidget::HashTableWidget(QWidget *parent)
     mainLayout->addLayout(m_layout);
     setLayout(mainLayout);
     connect(this, &HashTableWidget::cellFound, this, &HashTableWidget::highlightCell);
-    m_layout->setSpacing(10);
     m_layout->setColumnStretch(0, 0);
     m_layout->setColumnStretch(1, 1);
 }
@@ -104,6 +103,8 @@ void HashTableWidget::addRow(int key, const QString &value) {
 
     if (rowLayout == nullptr) {
         rowLayout = new QHBoxLayout();
+        rowLayout->setSpacing(100);
+        rowLayout->setContentsMargins(0, 0, 0, 0);
         m_layout->addLayout(rowLayout, bucketIndex, 1, Qt::AlignLeft);
     }
 
@@ -207,29 +208,29 @@ void HashTableWidget::paintEvent(QPaintEvent *event) {
     for (int bucketIndex = 0; bucketIndex < m_buckets.size(); ++bucketIndex) {
         NodeWidget* current = m_buckets[bucketIndex].head;
 
-        // Пропускаем пустые корзины и корзины с одним элементом
+
         if (current == nullptr || current->next == nullptr) {
             continue;
         }
 
         while (current != nullptr && current->next != nullptr) {
-            QWidget* currentWidget = current->widget;
-            QWidget* nextWidget = current->next->widget;
+           // QWidget* currentWidget =
+          //  QWidget* nextWidget = t;
 
 
-            QPoint currentRightCenter = currentWidget->mapToGlobal(currentWidget->rect().topRight());
-            currentRightCenter.setX(currentRightCenter.x() - currentWidget->rect().width() / 2);
+            QPoint currentPos = current->widget->pos();
+            currentPos.setY(currentPos.y() + current->widget->height() / 2);
 
 
-            QPoint nextLeftCenter = nextWidget->mapToGlobal(nextWidget->rect().topLeft());
-            nextLeftCenter.setX(nextLeftCenter.x() + nextWidget->rect().width() / 2);
+            QPoint nextPos = current->next->widget->pos();
+            nextPos.setY(nextPos.y() + current->next->widget->height() / 2);
 
 
-            int arrowOffset = 15;
+            int arrowOffsetLeft = 260;
+            int arrowOffsetRight = 10;
 
-
-            QPoint arrowStart = QPoint(currentRightCenter.x() + arrowOffset, currentRightCenter.y());
-            QPoint arrowEnd = QPoint(nextLeftCenter.x() - arrowOffset, nextLeftCenter.y());
+            QPoint arrowStart = QPoint(currentPos.x() + arrowOffsetLeft, currentPos.y());
+            QPoint arrowEnd = QPoint(nextPos.x() - arrowOffsetRight, nextPos.y());
 
 
             drawArrow(painter, arrowStart, arrowEnd);
@@ -248,7 +249,9 @@ void HashTableWidget::drawArrow(QPainter& painter, const QPoint& start, const QP
     painter.drawLine(start, end);
 
 
-    qreal angle = atan2(end.y() - start.y(), end.x() - start.x());
+
+
+     qreal angle = atan2(start.y() - end.y(), start.x() - end.x());
 
 
     int arrowSize = 10;
@@ -261,13 +264,12 @@ void HashTableWidget::drawArrow(QPainter& painter, const QPoint& start, const QP
 }
 
 void HashTableWidget::addConnection(int fromKey, int toKey) {
-
     int fromBucketIndex = m_hashTable.m_hashFunction->hash(fromKey, m_hashTable.capacity());
     int toBucketIndex = m_hashTable.m_hashFunction->hash(toKey, m_hashTable.capacity());
 
-
     HashTableCellWidget* fromWidget = nullptr;
     HashTableCellWidget* toWidget = nullptr;
+
 
     NodeWidget* current = m_buckets[fromBucketIndex].head;
     while (current != nullptr && fromWidget == nullptr) {
@@ -277,6 +279,7 @@ void HashTableWidget::addConnection(int fromKey, int toKey) {
         current = current->next;
     }
 
+
     current = m_buckets[toBucketIndex].head;
     while (current != nullptr && toWidget == nullptr) {
         if (current->widget->key() == toKey) {
@@ -285,17 +288,26 @@ void HashTableWidget::addConnection(int fromKey, int toKey) {
         current = current->next;
     }
 
-
     if (fromWidget == nullptr || toWidget == nullptr) {
         qWarning() << "HashTableWidget::addConnection: Widgets not found for keys"
                    << fromKey << "and" << toKey;
         return;
     }
 
-
     NodeWidget* newNode = new NodeWidget(toWidget);
-    newNode->next = m_buckets[fromBucketIndex].head;
-    m_buckets[fromBucketIndex].head = newNode;
+
+
+    current = m_buckets[fromBucketIndex].head;
+    if (current == nullptr) {
+
+        m_buckets[fromBucketIndex].head = newNode;
+    } else {
+        while (current->next != nullptr) {
+            current = current->next;
+        }
+
+        current->next = newNode;
+    }
 }
 
 void HashTableWidget::removeConnections(int key) {
@@ -333,8 +345,19 @@ void HashTableWidget::addNodeToBucket(int bucketIndex, HashTableCellWidget* cell
     NodeWidget* newNode = new NodeWidget(cell);
 
 
-    newNode->next = m_buckets[bucketIndex].head;
-    m_buckets[bucketIndex].head = newNode;
+    if (m_buckets[bucketIndex].head == nullptr) {
+        m_buckets[bucketIndex].head = newNode;
+        return;
+    }
+
+
+    NodeWidget* current = m_buckets[bucketIndex].head;
+    while (current->next != nullptr) {
+        current = current->next;
+    }
+
+    // Добавление нового узла в конец списка
+    current->next = newNode;
 }
 
 void HashTableWidget::removeNodeFromBucket(int bucketIndex, int key) {
