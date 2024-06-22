@@ -13,6 +13,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void onHashFunctionChanged(int index);
 
 private:
     Ui::MainWindow *ui;

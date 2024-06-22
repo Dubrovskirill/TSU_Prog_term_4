@@ -29,6 +29,8 @@ public slots:
     void resize(int size);
     void clear();
     void resetHighlight() ;
+    void setHashFunction(HashFunction* newHashFunction);
+    void updateTable();
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -45,15 +47,7 @@ private:
         QLabel *indexLabel = nullptr;
         NodeWidget *head = nullptr;
 
-        ~BucketWidget() {
-            NodeWidget *current = head;
-            while (current != nullptr) {
-                NodeWidget *next = current->next;
-                delete current->widget;
-                delete current;
-                current = next;
-            }
-        }
+        ~BucketWidget();
     };
 
     void addNodeToBucket(int bucketIndex, HashTableCellWidget* cell);
@@ -61,7 +55,6 @@ private:
     const BucketWidget* findBucket(int key) const;
     void clearBucket(BucketWidget* bucket);
     void drawArrow(QPainter& painter, const QPoint& start, const QPoint& end);
-    void resetHighlightInternal();
     void clearLayout();
     void drawBorder(HashTableCellWidget* cell, const QColor& color);
 
@@ -83,5 +76,6 @@ private:
 
 signals:
     void cellFound(int bucketIndex, int key) const;
-
+    void isExists(int key) const;
+    void isnotFound(int key) const;
 };

@@ -20,12 +20,22 @@ HashTableWidget::HashTableWidget(QWidget *parent)
     connect(this, &HashTableWidget::cellFound, this, &HashTableWidget::highlightCell);
     m_layout->setColumnStretch(0, 0);
     m_layout->setColumnStretch(1, 1);
-    m_layout->setRowStretch(0, 0);
+
     QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
     m_layout->addItem(verticalSpacer, m_buckets.size(), 0, 1, 2);
 
-
+    m_layout->setRowStretch(0, 0);
     m_layout->setRowStretch(1, 1);
+}
+
+HashTableWidget::BucketWidget::~BucketWidget() {
+    NodeWidget *current = head;
+    while (current != nullptr) {
+        NodeWidget *next = current->next;
+        delete current->widget;
+        delete current;
+        current = next;
+    }
 }
 
 HashTableWidget::~HashTableWidget()
@@ -65,7 +75,7 @@ int HashTableWidget::findRow(int key)  {
         }
         current = current->next;
     }
-
+    isnotFound(key);
     return -1;
 }
 
@@ -84,12 +94,14 @@ void HashTableWidget::drawBorder(HashTableCellWidget* cell, const QColor& color)
     update();
 }
 
+
 void HashTableWidget::addRow(int key, const QString &value) {
 
 
     if (m_hashTable.contains(key)) {
 
         qDebug() << "Ошибка: Ключ" << key << "уже существует в таблице.";
+        isExists(key);
         return;
     }
 
@@ -123,12 +135,13 @@ void HashTableWidget::addRow(int key, const QString &value) {
 
     addNodeToBucket(bucketIndex, cell);
 
-    m_layout->setRowStretch(m_buckets.size() - 1, 0);
+    m_layout->setRowStretch(m_buckets.size() - 1, 1);
     update();
 }
 
 bool HashTableWidget::removeRow(int key) {
 
+    resetHighlight();
     if (m_hashTable.erase(key)) {
         int bucketIndex = m_hashTable.m_hashFunction->hash(key, m_hashTable.capacity());
         removeNodeFromBucket(bucketIndex, key);
@@ -138,6 +151,8 @@ bool HashTableWidget::removeRow(int key) {
 }
 
 void HashTableWidget::resize(int newSize) {
+
+    resetHighlight();
 
     if (newSize <= 0) {
         return;
@@ -188,7 +203,7 @@ void HashTableWidget::resize(int newSize) {
         }
     }
 
-    m_layout->setRowStretch(m_buckets.size() - 1, 0);
+    m_layout->setRowStretch(m_buckets.size() - 1, 1);
     update();
 
 }
@@ -202,23 +217,11 @@ void HashTableWidget::clearLayout() {
     }
 }
 
-
-void HashTableWidget::clearBucket(BucketWidget* bucket) {
-    NodeWidget* current = bucket->head;
-    while (current != nullptr) {
-        NodeWidget* next = current->next;
-        delete current->widget;
-        delete current;
-        current = next;
-    }
-    bucket->head = nullptr;
-}
-
 void HashTableWidget::clear() {
 
 
     m_hashTable.clear();
-
+    resetHighlight();
 
     for (BucketWidget& bucket : m_buckets) {
         NodeWidget* current = bucket.head;
@@ -241,6 +244,21 @@ void HashTableWidget::clear() {
 
     m_buckets.clear();
 }
+
+
+void HashTableWidget::clearBucket(BucketWidget* bucket) {
+    NodeWidget* current = bucket->head;
+    while (current != nullptr) {
+        NodeWidget* next = current->next;
+        delete current->widget;
+        delete current;
+        current = next;
+    }
+    bucket->head = nullptr;
+    delete bucket->indexLabel;
+    bucket->indexLabel = nullptr;
+}
+
 void HashTableWidget::paintEvent(QPaintEvent *event) {
 
     QWidget::paintEvent(event);
@@ -260,17 +278,17 @@ void HashTableWidget::paintEvent(QPaintEvent *event) {
 
             QPoint currentPos = current->widget->pos();
             currentPos.setY(currentPos.y() + current->widget->height() / 2);
-
+            currentPos.setX(currentPos.x() + current->widget->width());
 
             QPoint nextPos = current->next->widget->pos();
             nextPos.setY(nextPos.y() + current->next->widget->height() / 2);
 
 
-            int arrowOffsetLeft = 260;
-            int arrowOffsetRight = 10;
 
-            QPoint arrowStart = QPoint(currentPos.x() + arrowOffsetLeft, currentPos.y());
-            QPoint arrowEnd = QPoint(nextPos.x() - arrowOffsetRight, nextPos.y());
+            int arrowOffset = 10;
+
+            QPoint arrowStart = QPoint(currentPos.x() + arrowOffset, currentPos.y());
+            QPoint arrowEnd = QPoint(nextPos.x() - arrowOffset, nextPos.y());
 
 
             drawArrow(painter, arrowStart, arrowEnd);
@@ -282,8 +300,8 @@ void HashTableWidget::paintEvent(QPaintEvent *event) {
     if (m_targetCell) {
         QPainter painter(this);
         painter.setRenderHint(QPainter::Antialiasing);
-        painter.setPen(QPen(m_borderColor, 3)); // 3 - толщина рамки
-        painter.drawRect(m_targetCell->geometry().adjusted(1, 1, -1, -1));
+        painter.setPen(QPen(m_borderColor, 3));
+        painter.drawRect(m_targetCell->geometry().adjusted(-3, 3, 3, -3));
     }
 }
 
@@ -417,6 +435,9 @@ void HashTableWidget::removeNodeFromBucket(int bucketIndex, int key) {
                 prev->next = current->next;
             }
             delete current->widget;
+            if(m_targetCell==current->widget){
+                resetHighlight();
+            }
             delete current;
             update();
             return;
@@ -431,7 +452,23 @@ const HashTableWidget::BucketWidget* HashTableWidget::findBucket(int key) const 
     return &(m_buckets[bucketIndex]);
 }
 
+void HashTableWidget::setHashFunction(HashFunction* newHashFunction) {
+    if (newHashFunction) {
 
+        m_hashTable.setHashFunction(newHashFunction);
+
+        resize(m_hashTable.capacity());
+    }
+}
+
+void HashTableWidget::updateTable() {
+
+    for (int i = 0; i < m_hashTable.capacity(); ++i) {
+        for (const auto &node : m_hashTable.m_table[i]) {
+            addRow(node.m_key, node.m_value);
+        }
+    }
+}
 
 
 
