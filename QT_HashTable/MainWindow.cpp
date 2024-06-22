@@ -67,7 +67,7 @@ void MainWindow::onHashFunctionChanged(int index) {
 
     if (newHashFunction != nullptr) {
         ui->hashTable->setHashFunction(newHashFunction);
-        ui->hashTable->updateTable();
+       // ui->hashTable->updateTable();
     }
 }
 

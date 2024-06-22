@@ -30,7 +30,7 @@ public slots:
     void clear();
     void resetHighlight() ;
     void setHashFunction(HashFunction* newHashFunction);
-    void updateTable();
+    //void updateTable();
 
 protected:
     void paintEvent(QPaintEvent *event) override;
