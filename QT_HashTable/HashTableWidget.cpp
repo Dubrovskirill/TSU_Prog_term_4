@@ -461,14 +461,7 @@ void HashTableWidget::setHashFunction(HashFunction* newHashFunction) {
     }
 }
 
-//void HashTableWidget::updateTable() {
 
-//    for (int i = 0; i < m_hashTable.capacity(); ++i) {
-//        for (const auto &node : m_hashTable.m_table[i]) {
-//            addRow(node.m_key, node.m_value);
-//        }
-//    }
-//}
 
 
 
